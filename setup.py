@@ -1,23 +1,17 @@
 #!/usr/bin/env python
 
-import imp
-
 from setuptools import find_packages, setup
-
-VERSION = imp.load_source("", "atlas_direction_vectors/version.py").__version__
 
 setup(
     name="atlas-direction-vectors",
-    author="BlueBrain NSE",
-    author_email="bbp-ou-nse@groupes.epfl.ch",
-    version=VERSION,
-    description="Commands to compute direction vectors in volumetric brain regions. "
-    "Direction vectors are 3D unit vectors associated to voxels of a brain region. "
-    "They represent the directions of the fiber tracts.",
-    url="https://bbpgitlab.epfl.ch/nse/atlas-direction-vectors",
-    download_url="git@bbpgitlab.epfl.ch:nse/atlas-direction-vectors.git",
-    license="BBP-internal-confidential",
-    python_requires=">=3.6.0",
+    author="Blue Brain Project, EPFL",
+    description=("Commands to compute direction vectors in volumetric brain regions. "
+                 "Direction vectors are 3D unit vectors associated to voxels of a brain region. "
+                 "They represent the directions of the fiber tracts."),
+    url="https://github.com/BlueBrain/atlas-direction-vectors",
+    download_url="https://github.com/BlueBrain/atlas-direction-vectors",
+    license="Apache-2",
+    python_requires=">=3.7.0",
     install_requires=[
         "atlas-commons>=0.1.3.dev0",
         "click>=7.0",
@@ -36,9 +30,21 @@ setup(
     entry_points={
         "console_scripts": ["atlas-direction-vectors=atlas_direction_vectors.app.cli:cli"]
     },
+
+    use_scm_version={
+        "local_scheme": "no-local-version",
+        },
+    setup_requires=[
+        'setuptools_scm',
+    ],
+
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-    ],
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+    ]
 )
