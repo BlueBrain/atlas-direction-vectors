@@ -10,8 +10,8 @@ Note: At the moment, direction vectors are generated only for the following cere
 """
 from typing import TYPE_CHECKING
 
-import numpy as np  # type: ignore
-from nptyping import NDArray  # type: ignore
+import numpy as np
+from atlas_commons.typing import FloatArray
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
     compute_layered_region_direction_vectors,
@@ -21,7 +21,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from voxcell import RegionMap, VoxelData  # type: ignore
 
 
-def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> NDArray[float]:
+def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
     """
     Computes cerebellum's direction vectors as the normalized gradient of a custom scalar field.
 
@@ -57,9 +57,7 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
     return direction_vectors
 
 
-def _flocculus_direction_vectors(
-    region_map: "RegionMap", annotation: "VoxelData"
-) -> NDArray[float]:
+def _flocculus_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
     """Returns the directin vectors for the flocculus subregions
 
     name: cerebellum related fiber tracts, acronym: cbf,  identifier = 960
@@ -104,7 +102,7 @@ def _flocculus_direction_vectors(
     )
 
 
-def _lingula_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> NDArray[float]:
+def _lingula_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
     """Returns direction vectors for the lingula subregions
 
     name: cerebellum related fiber tracts, acronym: cbf,  identifier = 960

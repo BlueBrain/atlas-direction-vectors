@@ -6,18 +6,19 @@ on the volume of interest. The algorithm returns the normalized gradient of this
 
 This algorithm can be used for laminar regions such as the isocortex.
 """
+from __future__ import annotations
 
-import numpy as np  # type: ignore
-import numpy.testing as npt  # type: ignore
-from nptyping import NDArray  # type: ignore
+import numpy as np
+import numpy.testing as npt
+from atlas_commons.typing import BoolArray, NDArray
 
 from atlas_direction_vectors.algorithms.utils import compute_blur_gradient
 
 
 def compute_direction_vectors(
-    source: NDArray[bool],
-    inside: NDArray[bool],
-    target: NDArray[bool],
+    source: BoolArray,
+    inside: BoolArray,
+    target: BoolArray,
     sigma: float = 10.0,
     source_weight: float = -1.0,
     target_weight: float = 1.0,

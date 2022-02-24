@@ -15,11 +15,13 @@ shells, a.k.a lower and upper shells.
 
 This script is used to compute the mouse isocortex and the mouse thalamus directions vectors.
 """
+from __future__ import annotations
+
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
-import numpy as np  # type: ignore
+import numpy as np
+from atlas_commons.typing import BoolArray, FloatArray, NDArray
 from atlas_commons.utils import create_layered_volume, split_into_halves
-from nptyping import NDArray  # type: ignore
 from voxcell import RegionMap, VoxelData  # type: ignore
 
 from atlas_direction_vectors.algorithms import blur_gradient, regiodesics, simple_blur_gradient
@@ -56,7 +58,7 @@ def attributes_to_ids(
 
 
 def direction_vectors_for_hemispheres(
-    landscape: Dict[str, NDArray[bool]],
+    landscape: Dict[str, BoolArray],
     algorithm: str,
     hemisphere_options: Optional[Dict[str, Union[str, None]]] = None,
     **kwargs: Union[int, float, str],
@@ -221,7 +223,7 @@ def compute_layered_region_direction_vectors(
     shading_width: int,
     expansion_width: int,
     has_hemispheres: bool = False,
-) -> NDArray[float]:
+) -> FloatArray:
     """
     Calculates the direction vectors in the layered region determined by `metadata`.
 
@@ -371,13 +373,13 @@ def _build_layered_region_weights(
 
 
 def _expanded_boundary_shading(
-    layered_region: NDArray[int],
+    layered_region: NDArray[np.integer],
     layers: List[int],
     layer_to_weight: Dict[int, int],
-    border_region_mask: NDArray[int],
+    border_region_mask: NDArray[np.integer],
     shading_complement: blur_gradient.RegionShading,
     expansion_width,
-) -> NDArray[int]:
+) -> NDArray[np.integer]:
     """Implementation of the compute_layered_region_direction_vectors algorithm.
 
     Arguments:

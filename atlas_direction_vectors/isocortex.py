@@ -1,14 +1,17 @@
 """
 Function computing the direction vectors of the mouse isocortex
 """
+from __future__ import annotations
+
 import logging
 import re
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Dict, List
+from typing import Callable, Dict, List
 
-import numpy as np  # type: ignore
+import numpy as np
+from atlas_commons.typing import AnnotationT, NDArray
 from atlas_commons.utils import get_region_mask
-from nptyping import NDArray  # type: ignore
+from voxcell import RegionMap, VoxelData  # type: ignore
 from voxcell.math_utils import minimum_aabb  # pylint: disable=ungrouped-imports
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
@@ -19,9 +22,6 @@ from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
 )
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.utils import warn_on_nan_vectors
-
-if TYPE_CHECKING:  # pragma: no cover
-    from voxcell import RegionMap, VoxelData  # type: ignore
 
 L = logging.getLogger(__name__)
 logging.captureWarnings(True)
@@ -38,7 +38,7 @@ LAYER_ENDINGS = "^([a-zA-Z]*-?[a-zA-Z]+)(?:[1-5]|2/3|6[ab])$"
 # including non-leaf represented from the hierarchy
 
 
-def get_isocortical_regions(annotation: NDArray[int], region_map: "RegionMap") -> List[str]:
+def get_isocortical_regions(annotation: AnnotationT, region_map: RegionMap) -> List[str]:
     """
     Get the acronyms of all isocortical regions present in `annotation`.
 
@@ -68,8 +68,8 @@ def get_isocortical_regions(annotation: NDArray[int], region_map: "RegionMap") -
 
 
 def _direction_vectors_per_region(
-    region_map: "RegionMap",
-    annotation: "VoxelData",
+    region_map: RegionMap,
+    annotation: VoxelData,
     algorithm: str = "regiodesics",
 ) -> NDArray[np.float32]:
     """
@@ -128,7 +128,7 @@ def _direction_vectors_per_region(
     return direction_vectors
 
 
-def _shading_gradient(region_map: "RegionMap", annotation: "VoxelData") -> NDArray[np.float32]:
+def _shading_gradient(region_map: RegionMap, annotation: VoxelData) -> NDArray[np.float32]:
     """
     Computes isocortex's direction vectors as the normalized gradient of a custom scalar field.
 
@@ -195,7 +195,7 @@ def _shading_gradient(region_map: "RegionMap", annotation: "VoxelData") -> NDArr
     )
 
 
-ISOCORTEX_ALGORITHMS: Dict[str, Callable[["RegionMap", "VoxelData"], NDArray[np.float32]]] = {
+ISOCORTEX_ALGORITHMS: Dict[str, Callable[[RegionMap, VoxelData], NDArray[np.float32]]] = {
     "regiodesics": partial(_direction_vectors_per_region, algorithm="regiodesics"),
     "simple-blur-gradient": partial(
         _direction_vectors_per_region, algorithm="simple-blur-gradient"
@@ -205,7 +205,7 @@ ISOCORTEX_ALGORITHMS: Dict[str, Callable[["RegionMap", "VoxelData"], NDArray[np.
 
 
 def compute_direction_vectors(
-    region_map: "RegionMap", annotation: "VoxelData", algorithm: str = "regiodesics"
+    region_map: RegionMap, annotation: VoxelData, algorithm: str = "regiodesics"
 ) -> NDArray[np.float32]:
     """Returns the direction vectors computed with the selected `algorithm`
 

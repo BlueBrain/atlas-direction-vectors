@@ -1,30 +1,30 @@
 """
 Functions for interpolating invalid direction vectors by valid ones
 """
+from __future__ import annotations
+
 import logging
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
+from atlas_commons.typing import AnnotationT, BoolArray, FloatArray, NDArray
 from atlas_commons.utils import create_layered_volume, query_region_mask, split_into_halves
-from nptyping import NDArray  # type: ignore
+from voxcell import RegionMap
 
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.vector_field import interpolate
-
-if TYPE_CHECKING:  # pragma: no cover
-    from voxcell import RegionMap  # type: ignore
 
 L = logging.getLogger(__name__)
 logging.captureWarnings(True)
 
 
 def interpolate_vectors(  # pylint: disable=too-many-locals, too-many-arguments
-    annotation: NDArray[int],
-    region_map: "RegionMap",
+    annotation: AnnotationT,
+    region_map: RegionMap,
     metadata: dict,
-    direction_vectors: NDArray[float],
+    direction_vectors: FloatArray,
     nans: bool = False,
-    mask: Optional[NDArray[bool]] = None,
+    mask: Optional[BoolArray] = None,
     restrict_to_hemisphere: bool = False,
     restrict_to_layer: bool = False,
 ) -> None:
@@ -81,7 +81,7 @@ def interpolate_vectors(  # pylint: disable=too-many-locals, too-many-arguments
     else:
         layered_volume = query_region_mask(metadata["region"], annotation, region_map)
 
-    layered_volumes: Tuple[NDArray[int], ...] = (layered_volume,)
+    layered_volumes: Tuple[NDArray[np.integer], ...] = (layered_volume,)
     if restrict_to_hemisphere:
         layered_volumes = split_into_halves(layered_volume)
 

@@ -22,7 +22,7 @@ See https://bbpteam.epfl.ch/project/issues/browse/NSETM-1454.
 from typing import Optional
 
 import numpy as np
-from nptyping import NDArray
+from atlas_commons.typing import BoolArray, FloatArray
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
@@ -34,9 +34,9 @@ INTERPOLATION_ALGORITHMS = {
 
 
 def interpolate(
-    field: NDArray[float],
-    unknown_values_mask: NDArray[bool],
-    known_values_mask: Optional[NDArray[bool]] = None,
+    field: FloatArray,
+    unknown_values_mask: BoolArray,
+    known_values_mask: Optional[BoolArray] = None,
     interpolator: str = "linear",
 ) -> None:
     """

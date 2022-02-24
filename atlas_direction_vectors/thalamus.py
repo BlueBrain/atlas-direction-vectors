@@ -1,28 +1,28 @@
 """
 Function computing the direction vectors of the mouse thalamus
 """
+from __future__ import annotations
+
 import logging
-from typing import TYPE_CHECKING, Union
+from typing import Union
 
 import numpy as np
+from atlas_commons.typing import BoolArray, NDArray
 from atlas_commons.utils import get_region_mask
-from nptyping import NDArray  # type: ignore
 from scipy.ndimage import correlate  # type: ignore
 from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
+from voxcell import RegionMap, VoxelData
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
     direction_vectors_for_hemispheres,
 )
 from atlas_direction_vectors.utils import warn_on_nan_vectors
 
-if TYPE_CHECKING:  # pragma: no cover
-    from voxcell import RegionMap, VoxelData  # type: ignore
-
 L = logging.getLogger(__name__)
 logging.captureWarnings(True)
 
 
-def _get_common_outer_boundary(mask: NDArray[bool], sub_mask: NDArray[bool]) -> NDArray[bool]:
+def _get_common_outer_boundary(mask: BoolArray, sub_mask: BoolArray) -> BoolArray:
     """
     Get the mask of the voxels outside `mask` which are both
     in the outer boundary of `mask` and of `sub_mask`.
@@ -48,7 +48,7 @@ def _get_common_outer_boundary(mask: NDArray[bool], sub_mask: NDArray[bool]) -> 
 
 
 def compute_direction_vectors(
-    region_map: Union[str, dict, "RegionMap"], brain_regions: "VoxelData"
+    region_map: Union[str, dict, RegionMap], brain_regions: VoxelData
 ) -> NDArray[np.float32]:
     """
     Compute the mouse thalamus direction vectors.

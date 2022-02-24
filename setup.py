@@ -19,16 +19,17 @@ setup(
     license="BBP-internal-confidential",
     python_requires=">=3.6.0",
     install_requires=[
-        "atlas-commons>=0.1.2",
+        "atlas-commons>=0.1.3.dev0",
         "click>=7.0",
-        "nptyping>=1.0.1",
         "numpy>=1.15.0",
         "numpy-quaternion[numba]>=2021.11.4.15.26.3",
         "scipy>=1.4.1",
         "voxcell>=3.0.0",
     ],
     extras_require={
-        "tests": ["pytest>=4.4.0", "mock>=2.0.0"],
+        "tests": [
+            "pytest>=4.4.0",
+        ],
     },
     packages=find_packages(),
     include_package_data=True,

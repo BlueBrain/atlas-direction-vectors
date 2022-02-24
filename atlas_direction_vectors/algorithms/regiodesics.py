@@ -11,15 +11,17 @@ direction vectors flowing from the bottom to the top shell.
 This algorithm is appropriate when the fibers of the brain region
 follow streamlines which start from and end to well identified surfaces.
 """
+from __future__ import annotations
+
 import logging
 from distutils.spawn import find_executable
 from pathlib import Path
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 
-import numpy as np  # type: ignore
+import numpy as np
+from atlas_commons.typing import BoolArray, NDArray
 from atlas_commons.utils import zero_to_nan
-from nptyping import NDArray  # type: ignore
 from voxcell import VoxelData  # type: ignore
 
 from atlas_direction_vectors.algorithms.utils import compute_boundary
@@ -78,7 +80,7 @@ def _popen_pipe_logging(tool: str, *args: str) -> None:
     check_call([tool, *args])
 
 
-def _get_border_mask(region: NDArray[bool]) -> NDArray[bool]:
+def _get_border_mask(region: BoolArray) -> BoolArray:
     """
     Get the mask of the elements masked by `region` lying on the borders of the array.
 
@@ -100,7 +102,7 @@ def _get_border_mask(region: NDArray[bool]) -> NDArray[bool]:
 
 
 def mark_with_regiodesics_labels(
-    bottom: NDArray[bool], in_between: NDArray[bool], top: NDArray[bool]
+    bottom: BoolArray, in_between: BoolArray, top: BoolArray
 ) -> NDArray[np.int8]:
     """Given 3 volumes, find the boundaries between them.
 
@@ -125,7 +127,7 @@ def mark_with_regiodesics_labels(
         _get_border_mask(in_between),
     )
 
-    def inner_boundary_with(mask: NDArray[bool]):
+    def inner_boundary_with(mask: BoolArray):
         """
         Ensures that bottom and top boundaries lie in the computed shell.
 
@@ -152,7 +154,7 @@ def mark_with_regiodesics_labels(
 
 
 def compute_direction_vectors(
-    bottom: NDArray[bool], in_between: NDArray[bool], top: NDArray[bool]
+    bottom: BoolArray, in_between: BoolArray, top: BoolArray
 ) -> NDArray[np.float32]:
     """
     Generate direction vectors for the `in_between` volume.

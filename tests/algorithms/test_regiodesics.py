@@ -1,7 +1,8 @@
+from unittest.mock import patch
+
 import numpy as np
 import numpy.testing as npt
 import pytest
-from mock import patch
 
 from atlas_direction_vectors.algorithms import regiodesics as tested
 from atlas_direction_vectors.algorithms.regiodesics import RegiodesicsLabels

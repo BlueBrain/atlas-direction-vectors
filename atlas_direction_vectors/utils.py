@@ -6,7 +6,7 @@ import warnings
 from pathlib import Path
 
 import numpy as np
-from nptyping import NDArray  # type: ignore
+from atlas_commons.typing import BoolArray, FloatArray
 
 L = logging.getLogger(__name__)
 logging.captureWarnings(True)
@@ -16,7 +16,7 @@ HIERARCHY_PATH = str(Path(TEST_PATH, "1.json"))
 
 
 def warn_on_nan_vectors(
-    direction_vectors: NDArray[float], region_mask: NDArray[bool], region_name: str
+    direction_vectors: FloatArray, region_mask: BoolArray, region_name: str
 ) -> None:
     """
     Warn on the consequences of (NaN, NaN, NaN) vectors when some are reported.

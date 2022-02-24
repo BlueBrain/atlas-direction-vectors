@@ -19,12 +19,13 @@ with thin shadings close to specific boundaries.
 A Gaussian blur is then applied to the initial scalar field and
 the normalized gradient is returned.
 """
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List
 
-import numpy as np  # type: ignore
-from nptyping import NDArray
+import numpy as np
+from atlas_commons.typing import AnnotationT, NDArray
 from scipy.ndimage import binary_dilation, generate_binary_structure
 
 from atlas_direction_vectors.algorithms.utils import compute_blur_gradient
@@ -70,8 +71,8 @@ class RegionShading:
 
 
 def shading_from_boundary(
-    annotation_raw: NDArray[int], region_shading: RegionShading
-) -> NDArray[int]:
+    annotation_raw: AnnotationT, region_shading: RegionShading
+) -> NDArray[np.integer]:
     """
     Computes a scalar field which increases with the distance to a region.
 
@@ -127,8 +128,8 @@ def shading_from_boundary(
 
 
 def _sequential_region_shading(
-    annotation_raw: NDArray[int], region_label: int, shading_target_label: int, shades: List[int]
-) -> NDArray[int]:
+    annotation_raw: AnnotationT, region_label: int, shading_target_label: int, shades: List[int]
+) -> NDArray[np.integer]:
     """Grows a region outwards using morphological binary dilation.
 
     The region that will be expanded corresponds to the voxels in `annotation_raw` that have a
@@ -167,8 +168,8 @@ def _sequential_region_shading(
 
 
 def region_dilation(
-    annotation_raw: NDArray[int], region_label: int, shading_target_label: int = 0
-) -> NDArray[int]:
+    annotation_raw: AnnotationT, region_label: int, shading_target_label: int = 0
+) -> NDArray[np.integer]:
     """Dilates selectively a region using a box of shape (3, 3, 3).
 
     The dilation morphological operation is applied exclusively on `annotation_raw` region, the
@@ -202,7 +203,7 @@ def region_dilation(
     return binary_dilation(isolated_mask, struct) & allowed_region
 
 
-def compute_initial_field(annotation_raw, region_weights, shadings=()):
+def compute_initial_field(annotation_raw: AnnotationT, region_weights, shadings=()):
     """
     Initialize a scalar field based on local region fields.
 
