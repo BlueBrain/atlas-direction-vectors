@@ -283,7 +283,7 @@ def compute_layered_region_direction_vectors(
         raise AtlasDirectionVectorsError(
             f"Layer queries are not included in the region_to_weight dict\n"
             f"Layer queries: {layer_queries}\n"
-            f"{region_to_weight=}"
+            f"region_to_weight={region_to_weight}"
         )
 
     layered_region = create_layered_volume(annotation.raw, region_map, metadata)

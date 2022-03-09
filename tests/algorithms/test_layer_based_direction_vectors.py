@@ -8,6 +8,7 @@ from voxcell import RegionMap, VoxelData
 
 from atlas_direction_vectors.algorithms import layer_based_direction_vectors as tested
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
+from tests.mark import skip_if_no_regiodesics
 
 
 class Test_attributes_to_ids:
@@ -156,6 +157,7 @@ class Test_direction_vectors_for_hemispheres:
         # Non-NaN direction vectors have unit norm
         npt.assert_array_almost_equal(norm[inside], np.full((16, 16, 16), 1.0)[inside])
 
+    @skip_if_no_regiodesics
     def test_regiodesics_without_hemispheres(self):
         l1 = self.landscape_1()
         direction_vectors = tested.direction_vectors_for_hemispheres(l1, "regiodesics")
@@ -176,6 +178,7 @@ class Test_direction_vectors_for_hemispheres:
         )
         check_direction_vectors(direction_vectors, self.landscape_2()["inside"])
 
+    @skip_if_no_regiodesics
     def test_regiodesics_with_hemispheres_no_opposite(self):
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
@@ -194,6 +197,7 @@ class Test_direction_vectors_for_hemispheres:
             direction_vectors, self.landscape_2()["inside"], {"opposite": "target"}
         )
 
+    @skip_if_no_regiodesics
     def test_regiodesics_with_opposite_hemisphere_as_target(self):
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
@@ -214,6 +218,7 @@ class Test_direction_vectors_for_hemispheres:
             direction_vectors, self.landscape_3()["inside"], {"opposite": "source"}
         )
 
+    @skip_if_no_regiodesics
     def test_regiodesics_with_opposite_hemisphere_as_source(self):
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_3(),
@@ -393,6 +398,7 @@ class Test_compute_direction_vectors:
         inside = np.isin(self.voxel_data_2().raw, ids)
         check_direction_vectors(direction_vectors, inside, {"opposite": "source"})
 
+    @skip_if_no_regiodesics
     def test_regiodesics_with_opposite_hemisphere_as_source(self):
         direction_vectors = tested.compute_direction_vectors(
             self.fake_hierarchy_json(),
