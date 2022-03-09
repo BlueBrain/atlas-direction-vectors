@@ -8,6 +8,7 @@ from voxcell import RegionMap, VoxelData
 
 import atlas_direction_vectors.isocortex as tested
 from tests.algorithms.test_layer_based_direction_vectors import check_direction_vectors
+from tests.mark import skip_if_no_regiodesics
 
 TEST_PATH = Path(Path(__file__).parent)
 HIERARCHY_PATH = str(Path(TEST_PATH, "1.json"))
@@ -49,6 +50,7 @@ def test_get_isocortical_regions(region_map):
     npt.assert_array_equal(regions, expected)
 
 
+@skip_if_no_regiodesics
 def test_compute_direction_vectors(region_map):
     # Two high-level regions, namely ACAd and ACAv
     # with layers 1, 2/3, 5 and 6

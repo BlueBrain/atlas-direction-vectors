@@ -7,6 +7,7 @@ import pytest
 from atlas_direction_vectors.algorithms import regiodesics as tested
 from atlas_direction_vectors.algorithms.regiodesics import RegiodesicsLabels
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
+from tests.mark import skip_if_no_regiodesics
 
 
 @patch(
@@ -63,6 +64,7 @@ def test_mark_with_regiodesics_labels_exception():
     assert "Empty top" in str(error.value)
 
 
+@skip_if_no_regiodesics
 def test_compute_direction_vectors():
     raw = np.zeros((8, 8, 8), dtype=int)
     raw[:, :, :2] = 1  # bottom
