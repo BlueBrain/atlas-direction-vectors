@@ -13,8 +13,10 @@ from atlas_commons.app_utils import (
     set_verbose,
 )
 
+import atlas_direction_vectors
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
+from atlas_direction_vectors.algorithms import layer_based_direction_vectors
 from atlas_direction_vectors.algorithms.regiodesics import find_regiodesics_exec_or_raise
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.interpolation import interpolate_vectors
@@ -281,3 +283,74 @@ def interpolate(  # pylint: disable=too-many-arguments,too-many-locals
     )
 
     direction_vectors.save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@click.option("--outside-brain", type=int)
+@click.option("--layer", type=(str, int), multiple=True)
+@click.option("--hemisphere/--no-hemisphere", default=True)
+@log_args(L)
+def layer_region(annotation_path, hierarchy_path, output_path, outside_brain, layer, hemisphere):
+    """Generate and save the direction vectors for an arbitrary region"""
+    from atlas_direction_vectors.region import layered_region
+
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+    dir_vectors = layered_region(annotation, region_map, outside_brain, dict(layer), hemisphere)
+    annotation.with_data(dir_vectors).save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@click.option("--source", type=str)
+@click.option("--region", type=str)
+@click.option("--target", type=str)
+@click.option("--algorithm", type=click.Choice(list(layer_based_direction_vectors.ALGORITHMS)))
+@click.option(
+    "--hemisphere-option",
+    type=click.Choice(
+        [h.name.lower() for h in layer_based_direction_vectors.HemisphereOppositeOption]
+    ),
+    default=layer_based_direction_vectors.HemisphereOppositeOption.NO_SPLIT,
+)
+@log_args(L)
+def source_target_layered_region(
+    annotation_path,
+    hierarchy_path,
+    output_path,
+    source,
+    region,
+    target,
+    algorithm,
+    hemisphere_option,
+):
+    """Generate and save the direction vectors for an arbitrary region"""
+    from atlas_direction_vectors.region import source_target_layered_region
+
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+    hemisphere_option = layer_based_direction_vectors.HemisphereOppositeOption[
+        hemisphere_option.upper()
+    ]
+
+    dir_vectors = source_target_layered_region(
+        annotation,
+        region_map,
+        algorithm,
+        source,
+        region,
+        target,
+        hemisphere_option,
+    )
+    annotation.with_data(dir_vectors).save_nrrd(output_path)

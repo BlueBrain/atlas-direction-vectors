@@ -68,7 +68,7 @@ def _flocculus_direction_vectors(region_map: "RegionMap", annotation: "VoxelData
     metadata = {
         "region": {
             "name": "Extended Flocculus",
-            "query": "@^\\bFL|cbf\\b$",
+            "query": r"@^\bFL|cbf\b$",
             "attribute": "acronym",
             "with_descendants": True,
         },
@@ -113,7 +113,7 @@ def _lingula_direction_vectors(region_map: "RegionMap", annotation: "VoxelData")
     metadata = {
         "region": {
             "name": "Extended Lingula",
-            "query": "@^\\bLING|cbf\\b$",
+            "query": r"@^\bLING|cbf\b$",
             "attribute": "acronym",
             "with_descendants": True,
         },

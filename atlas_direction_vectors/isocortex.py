@@ -31,6 +31,7 @@ LAYER_ENDINGS = "^([a-zA-Z]*-?[a-zA-Z]+)(?:[1-5]|2/3|6[ab])$"
 # pylint: disable=fixme
 # TODO: get layered subregions, excluding unrepresented
 # including non-leaf represented from the hierarchy
+# pylint: enable=fixme
 
 
 def get_isocortical_regions(annotation: AnnotationT, region_map: RegionMap) -> List[str]:
