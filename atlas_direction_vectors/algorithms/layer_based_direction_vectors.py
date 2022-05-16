@@ -17,7 +17,7 @@ This script is used to compute the mouse isocortex and the mouse thalamus direct
 """
 from __future__ import annotations
 
-from enum import Enum
+import enum
 from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
@@ -34,13 +34,13 @@ ALGORITHMS: Dict[str, Callable] = {
 }
 
 
-class HemisphereOppositeOption(Enum):
+class HemisphereOppositeOption(enum.Enum):
     """Options for how hemipheres are handled"""
 
-    NO_SPLIT = 1  # the region of interest is not split into hemispheres
-    INCLUDE_AS_SOURCE = 2  # opposite hemisphere used as source
-    INCLUDE_AS_TARGET = 3  # opposite hemisphere used as target
-    IGNORE_OPPOSITE_HEMISPHERE = 4  # opposite hemisphere is not used
+    NO_SPLIT = enum.auto()  # the region of interest is not split into hemispheres
+    INCLUDE_AS_SOURCE = enum.auto()  # opposite hemisphere used as source
+    INCLUDE_AS_TARGET = enum.auto()  # opposite hemisphere used as target
+    IGNORE_OPPOSITE_HEMISPHERE = enum.auto()  # opposite hemisphere is not used
 
 
 def attributes_to_ids(
