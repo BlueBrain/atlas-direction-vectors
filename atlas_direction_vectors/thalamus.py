@@ -14,6 +14,7 @@ from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
 from voxcell import RegionMap, VoxelData
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
+    HemisphereOppositeOption,
     direction_vectors_for_hemispheres,
 )
 from atlas_direction_vectors.utils import warn_on_nan_vectors
@@ -76,7 +77,7 @@ def compute_direction_vectors(
     rt_complement_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_options={"set_opposite_hemisphere_as": "source"},
+        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
         # The constants below have been derived empirically by Hugo Dictus
         sigma=ratio * 18.0,
         source_weight=-2.0 * 0.9999999,
@@ -90,7 +91,7 @@ def compute_direction_vectors(
     rt_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_options={"set_opposite_hemisphere_as": "source"},
+        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
         # The constants below have been derived empirically by Hugo Dictus
         sigma=ratio * 5.0,
         source_weight=-1,

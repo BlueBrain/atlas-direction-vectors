@@ -17,7 +17,8 @@ This script is used to compute the mouse isocortex and the mouse thalamus direct
 """
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
+import enum
+from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
 from atlas_commons.typing import BoolArray, FloatArray, NDArray
@@ -31,6 +32,15 @@ ALGORITHMS: Dict[str, Callable] = {
     "simple-blur-gradient": simple_blur_gradient.compute_direction_vectors,
     "regiodesics": regiodesics.compute_direction_vectors,
 }
+
+
+class HemisphereOppositeOption(enum.Enum):
+    """Options for how hemipheres are handled"""
+
+    NO_SPLIT = enum.auto()  # the region of interest is not split into hemispheres
+    INCLUDE_AS_SOURCE = enum.auto()  # opposite hemisphere used as source
+    INCLUDE_AS_TARGET = enum.auto()  # opposite hemisphere used as target
+    IGNORE_OPPOSITE_HEMISPHERE = enum.auto()  # opposite hemisphere is not used
 
 
 def attributes_to_ids(
@@ -60,7 +70,7 @@ def attributes_to_ids(
 def direction_vectors_for_hemispheres(
     landscape: Dict[str, BoolArray],
     algorithm: str,
-    hemisphere_options: Optional[Dict[str, Union[str, None]]] = None,
+    hemisphere_opposite_option: HemisphereOppositeOption,
     **kwargs: Union[int, float, str],
 ) -> NDArray[np.float32]:
     """
@@ -77,14 +87,7 @@ def direction_vectors_for_hemispheres(
                 'target' is the 3D binary mask of the fibers target region.
         algorithm: the algorithm to use to generate direction vectors
                    (either 'simple-blur-gradient' or 'regiodesics').
-        hemisphere_options(None|dict): None or a dict of the form
-            {'set_opposite_hemisphere_as': <str>} or {'set_opposite_hemisphere_as': None}.
-            If `hemisphere_options` is None, i.e., the default value, the region of interest
-            is not split into hemispheres. Otherwise, the string value corresponding to
-            'set_opposite_hemisphere_as' indicates, if for each hemisphere the opposite hemisphere
-            should be included as a source or a target for the former. The possible values are
-            'source', 'target' or None. If the value is None, the opposite hemisphere is not used,
-            neither as source, nor as target.
+        hemisphere_opposite_option: how the opposite hemisphere should be handled
         kwargs: (optional) Options specific to the underlying algorithm.
             For regiodesics.compute_direction_vectors, the option regiodesics_path=str can be used
             to indicate where the regiodesics executable is located. Otherwise this function will
@@ -98,21 +101,16 @@ def direction_vectors_for_hemispheres(
         of this array is (W, L, D, 3) if the shape of `inside` is (W, L, D).
         Outside the `inside` volume, the returned direction vectors have np.nan coordinates.
     """
+    assert isinstance(
+        hemisphere_opposite_option, HemisphereOppositeOption
+    ), f"Not a valid hemisphere_opposite_option: {hemisphere_opposite_option}"
     if algorithm not in ALGORITHMS:
         raise ValueError(f"algorithm must be one of {ALGORITHMS.keys()}")
 
-    set_opposite_hemisphere_as = (
-        hemisphere_options["set_opposite_hemisphere_as"] if hemisphere_options is not None else None
-    )
-    if set_opposite_hemisphere_as not in {None, "source", "target"}:
-        raise (
-            ValueError(
-                'Argument "set_opposite_hemisphere_as" should be None, "source" or'
-                f' "target". Got {set_opposite_hemisphere_as}'
-            )
-        )
-    hemisphere_masks = [landscape["inside"]]
-    if hemisphere_options is not None:
+    hemisphere_masks = [
+        landscape["inside"],
+    ]
+    if hemisphere_opposite_option != HemisphereOppositeOption.NO_SPLIT:
         # We assume that the region of interest has two hemispheres
         # which are symetric wrt the plane z = volume.shape[2] // 2.
         hemisphere_masks = split_into_halves(  # type: ignore
@@ -123,12 +121,12 @@ def direction_vectors_for_hemispheres(
     for hemisphere in hemisphere_masks:
         source = (
             np.logical_or(landscape["source"], ~hemisphere)
-            if set_opposite_hemisphere_as == "source"
+            if hemisphere_opposite_option == HemisphereOppositeOption.INCLUDE_AS_SOURCE
             else np.logical_and(landscape["source"], hemisphere)
         )
         target = (
             np.logical_or(landscape["target"], ~hemisphere)
-            if set_opposite_hemisphere_as == "target"
+            if hemisphere_opposite_option == HemisphereOppositeOption.INCLUDE_AS_TARGET
             else np.logical_and(landscape["target"], hemisphere)
         )
         direction_vectors[hemisphere] = ALGORITHMS[algorithm](
@@ -147,7 +145,7 @@ def compute_direction_vectors(
     annotation: Union[str, VoxelData],
     landscape: Dict[str, AttributeList],
     algorithm: str = "simple-blur-gradient",
-    hemisphere_options: Optional[Dict[str, Union[str, None]]] = None,
+    hemisphere_opposite_option: HemisphereOppositeOption = HemisphereOppositeOption.NO_SPLIT,
     **kwargs: Union[int, float, str],
 ) -> NDArray[np.float32]:
     """
@@ -170,14 +168,7 @@ def compute_direction_vectors(
         algorithm: name of the algorithm to be used for the computation
             of direction vectors. One of `regiodesics` or `simple-blur-gradient`.
             Defaults to `simple-blur-gradient`.
-        hemisphere_options: None or a dict of the form
-            {'set_opposite_hemisphere_as': str} or {'set_opposite_hemisphere_as': None}.
-            If `hemisphere_options` is None, i.e., the default value, the region of interest
-            is not split into hemispheres. Otherwise, the string value corresponding to
-            'set_opposite_hemisphere_as' indicates, if for each hemisphere the opposite hemisphere
-            should be included as a source or a target for the former. The possible values are
-            'source', 'target' or None. If the value is None, the opposite hemisphere is not used,
-            neither as source, nor as target.
+        hemisphere_opposite_option: how the opposite hemisphere should be handled
         kwargs: see direction_vectors_for_hemispheres documentation.
 
     Returns:
@@ -208,7 +199,7 @@ def compute_direction_vectors(
         ),
     }
     direction_vectors = direction_vectors_for_hemispheres(
-        landscape, algorithm, hemisphere_options, **kwargs
+        landscape, algorithm, hemisphere_opposite_option, **kwargs
     )
 
     return direction_vectors

@@ -138,16 +138,18 @@ class Test_direction_vectors_for_hemispheres:
         return {"source": source, "inside": inside, "target": target}
 
     def test_invalid_option(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             tested.direction_vectors_for_hemispheres(
-                self.landscape_1(),
-                "simple-blur-gradient",
-                {"set_opposite_hemisphere_as": "invalid"},
+                self.landscape_1(), "simple-blur-gradient", hemisphere_opposite_option="asdf"
             )
 
     def test_simple_blur_without_hemispheres(self):
         l1 = self.landscape_1()
-        direction_vectors = tested.direction_vectors_for_hemispheres(l1, "simple-blur-gradient")
+        direction_vectors = tested.direction_vectors_for_hemispheres(
+            l1,
+            "simple-blur-gradient",
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.NO_SPLIT,
+        )
         inside = l1["inside"]
         assert np.all(~np.isnan(direction_vectors[inside, :]))
         assert np.all(direction_vectors[inside, 2] > 0.0)  # vectors flow along the positive z-axis
@@ -160,7 +162,9 @@ class Test_direction_vectors_for_hemispheres:
     @skip_if_no_regiodesics
     def test_regiodesics_without_hemispheres(self):
         l1 = self.landscape_1()
-        direction_vectors = tested.direction_vectors_for_hemispheres(l1, "regiodesics")
+        direction_vectors = tested.direction_vectors_for_hemispheres(
+            l1, "regiodesics", hemisphere_opposite_option=tested.HemisphereOppositeOption.NO_SPLIT
+        )
         inside = l1["inside"]
         assert np.all(~np.isnan(direction_vectors[inside, :]))
         assert np.all(direction_vectors[inside, 2] > 0.0)  # vectors flow along the positive z-axis
@@ -174,7 +178,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": None},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE,
         )
         check_direction_vectors(direction_vectors, self.landscape_2()["inside"])
 
@@ -183,7 +187,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
             "regiodesics",
-            {"set_opposite_hemisphere_as": None},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE,
         )
         check_direction_vectors(direction_vectors, self.landscape_2()["inside"])
 
@@ -191,7 +195,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": "target"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_TARGET,
         )
         check_direction_vectors(
             direction_vectors, self.landscape_2()["inside"], {"opposite": "target"}
@@ -202,7 +206,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_2(),
             "regiodesics",
-            {"set_opposite_hemisphere_as": "target"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_TARGET,
         )
         check_direction_vectors(
             direction_vectors, self.landscape_2()["inside"], {"opposite": "target"}
@@ -212,7 +216,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_3(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": "source"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_SOURCE,
         )
         check_direction_vectors(
             direction_vectors, self.landscape_3()["inside"], {"opposite": "source"}
@@ -223,7 +227,7 @@ class Test_direction_vectors_for_hemispheres:
         direction_vectors = tested.direction_vectors_for_hemispheres(
             self.landscape_3(),
             "regiodesics",
-            {"set_opposite_hemisphere_as": "source"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_SOURCE,
         )
         check_direction_vectors(
             direction_vectors, self.landscape_3()["inside"], {"opposite": "source"}
@@ -359,7 +363,7 @@ class Test_compute_direction_vectors:
             self.voxel_data_2(),
             self.landscape_2(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": None},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE,
         )
         ids = tested.attributes_to_ids(
             self.fake_hierarchy_json(),
@@ -374,7 +378,7 @@ class Test_compute_direction_vectors:
             self.voxel_data_2(),
             self.landscape_2(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": "target"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_TARGET,
         )
         ids = tested.attributes_to_ids(
             self.fake_hierarchy_json(),
@@ -389,7 +393,7 @@ class Test_compute_direction_vectors:
             self.voxel_data_2(),
             self.landscape_3(),
             "simple-blur-gradient",
-            {"set_opposite_hemisphere_as": "source"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_SOURCE,
         )
         ids = tested.attributes_to_ids(
             self.fake_hierarchy_json(),
@@ -405,7 +409,7 @@ class Test_compute_direction_vectors:
             self.voxel_data_2(),
             self.landscape_3(),
             "regiodesics",
-            {"set_opposite_hemisphere_as": "source"},
+            hemisphere_opposite_option=tested.HemisphereOppositeOption.INCLUDE_AS_SOURCE,
         )
         ids = tested.attributes_to_ids(
             self.fake_hierarchy_json(),
