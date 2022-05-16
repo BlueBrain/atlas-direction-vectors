@@ -14,12 +14,7 @@ from atlas_commons.utils import get_region_mask
 from voxcell import RegionMap, VoxelData  # type: ignore
 from voxcell.math_utils import minimum_aabb  # pylint: disable=ungrouped-imports
 
-from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
-    compute_direction_vectors as layer_based_direction_vectors,
-)
-from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
-    compute_layered_region_direction_vectors,
-)
+from atlas_direction_vectors.algorithms import layer_based_direction_vectors
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.utils import warn_on_nan_vectors
 
@@ -99,7 +94,7 @@ def _direction_vectors_per_region(
         )
         voxel_data = annotation.with_data(annotation.raw[aabb_slice])
         try:
-            region_direction_vectors = layer_based_direction_vectors(
+            region_direction_vectors = layer_based_direction_vectors.compute_direction_vectors(
                 region_map,
                 voxel_data,
                 {
@@ -110,7 +105,9 @@ def _direction_vectors_per_region(
                     "target": [("acronym", "@.*1$")],
                 },
                 algorithm=algorithm,
-                hemisphere_options={"set_opposite_hemisphere_as": "target"},
+                hemisphere_opposite_option=(
+                    layer_based_direction_vectors.HemisphereOppositeOption.INCLUDE_AS_TARGET
+                ),
             )
         except AtlasDirectionVectorsError as error:
             L.warning(error)
@@ -184,7 +181,7 @@ def _shading_gradient(region_map: RegionMap, annotation: VoxelData) -> NDArray[n
         "lfbs": -2,
         "outside_of_brain": 0,
     }
-    return compute_layered_region_direction_vectors(
+    return layer_based_direction_vectors.compute_layered_region_direction_vectors(
         region_map=region_map,
         annotation=annotation,
         metadata=metadata,
