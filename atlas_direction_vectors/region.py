@@ -1,3 +1,4 @@
+"""Generic tools for finding direction vectors in a region"""
 import numpy as np
 from atlas_commons.utils import get_region_mask
 from voxcell.math_utils import minimum_aabb  # pylint: disable=ungrouped-imports
@@ -9,7 +10,7 @@ from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
 
 
 def layered_region(annotation, region_map, outside_of_brain, layer_weights, has_hemispheres):
-    """ """
+    """wrapper for compute_layered_region_direction_vectors so not all metadata is needed"""
     # convert to metadata
     query = "@" + "|".join(rf"\b{acronym}\b" for acronym in layer_weights)
     metadata = {

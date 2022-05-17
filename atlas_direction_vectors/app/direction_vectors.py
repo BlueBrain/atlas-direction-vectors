@@ -1,5 +1,5 @@
 """Generate and save the direction vectors for different regions of the mouse brain"""
-# pylint: disable=import-outside-toplevel
+# pylint: disable=import-outside-toplevel,too-many-arguments
 import json
 import logging
 
@@ -13,7 +13,6 @@ from atlas_commons.app_utils import (
     set_verbose,
 )
 
-import atlas_direction_vectors
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
 from atlas_direction_vectors.algorithms import layer_based_direction_vectors
@@ -297,7 +296,19 @@ def interpolate(  # pylint: disable=too-many-arguments,too-many-locals
 @click.option("--hemisphere/--no-hemisphere", default=True)
 @log_args(L)
 def layer_region(annotation_path, hierarchy_path, output_path, outside_brain, layer, hemisphere):
-    """Generate and save the direction vectors for an arbitrary region"""
+    """Generate and save the direction vectors for an arbitrary region
+
+    The --layer options is ordered with the value attached to the specific voxels:
+
+        --outside-brain  10
+        --layer VISpm1     2
+        --layer VISpm2/3   1
+        --layer VISpm4     0
+        --layer VISpm5    -1
+        --layer VISpm6a   -2
+        --layer VISpm6b   -3
+
+    """
     from atlas_direction_vectors.region import layered_region
 
     annotation = voxcell.VoxelData.load_nrrd(annotation_path)
@@ -313,9 +324,9 @@ def layer_region(annotation_path, hierarchy_path, output_path, outside_brain, la
     required=True,
     help="Path of file to write the direction vectors to.",
 )
-@click.option("--source", type=str)
-@click.option("--region", type=str)
-@click.option("--target", type=str)
+@click.option("--source", type=str, help="atlas acronym to be used as the source")
+@click.option("--region", type=str, help="atlas acronum region of interest")
+@click.option("--target", type=str, help="atlas acronym to be used as the target")
 @click.option("--algorithm", type=click.Choice(list(layer_based_direction_vectors.ALGORITHMS)))
 @click.option(
     "--hemisphere-option",
@@ -335,8 +346,12 @@ def source_target_layered_region(
     algorithm,
     hemisphere_option,
 ):
-    """Generate and save the direction vectors for an arbitrary region"""
-    from atlas_direction_vectors.region import source_target_layered_region
+    """Generate and save the direction vectors for an arbitrary region
+    --source '@.*6[b]$'
+    --target "@.*1$"
+    --region VISpm
+    """
+    from atlas_direction_vectors.region import source_target_layered_region as stlr
 
     annotation = voxcell.VoxelData.load_nrrd(annotation_path)
     region_map = voxcell.RegionMap.load_json(hierarchy_path)
@@ -344,7 +359,7 @@ def source_target_layered_region(
         hemisphere_option.upper()
     ]
 
-    dir_vectors = source_target_layered_region(
+    dir_vectors = stlr(
         annotation,
         region_map,
         algorithm,
