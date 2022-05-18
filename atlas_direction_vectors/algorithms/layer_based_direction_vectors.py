@@ -290,7 +290,7 @@ def compute_layered_region_direction_vectors(
     # example: ids[ids!=0] -> [1, 2, 3], layers -> [1, 2], external_id -> 3
     *layers, external_id = ids[ids != 0]
 
-    layer_to_weight = _build_layered_region_weights(metadata["layers"]["queries"], region_to_weight)
+    layer_to_weight = _build_layered_region_weights(layer_queries, region_to_weight)
 
     # make a mask separating the first layer from the rest
     border_region_mask = np.zeros(annotation.raw.shape, dtype=np.uint8)

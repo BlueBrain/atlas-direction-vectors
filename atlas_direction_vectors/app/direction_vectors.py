@@ -1,5 +1,5 @@
 """Generate and save the direction vectors for different regions of the mouse brain"""
-# pylint: disable=import-outside-toplevel
+# pylint: disable=import-outside-toplevel,too-many-arguments
 import json
 import logging
 
@@ -15,6 +15,7 @@ from atlas_commons.app_utils import (
 
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
+from atlas_direction_vectors.algorithms import layer_based_direction_vectors
 from atlas_direction_vectors.algorithms.regiodesics import find_regiodesics_exec_or_raise
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.interpolation import interpolate_vectors
@@ -281,3 +282,90 @@ def interpolate(  # pylint: disable=too-many-arguments,too-many-locals
     )
 
     direction_vectors.save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@click.option("--outside-brain", type=int)
+@click.option("--layer", type=(str, int), multiple=True)
+@click.option("--hemisphere/--no-hemisphere", default=True)
+@log_args(L)
+def layer_region(annotation_path, hierarchy_path, output_path, outside_brain, layer, hemisphere):
+    """Generate and save the direction vectors for an arbitrary region
+
+    The --layer options is ordered with the value attached to the specific voxels:
+
+        --outside-brain  10
+        --layer VISpm1     2
+        --layer VISpm2/3   1
+        --layer VISpm4     0
+        --layer VISpm5    -1
+        --layer VISpm6a   -2
+        --layer VISpm6b   -3
+
+    """
+    from atlas_direction_vectors.region import layered_region
+
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+    dir_vectors = layered_region(annotation, region_map, outside_brain, dict(layer), hemisphere)
+    annotation.with_data(dir_vectors).save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@click.option("--source", type=str, help="atlas acronym to be used as the source")
+@click.option("--region", type=str, help="atlas acronum region of interest")
+@click.option("--target", type=str, help="atlas acronym to be used as the target")
+@click.option("--algorithm", type=click.Choice(list(layer_based_direction_vectors.ALGORITHMS)))
+@click.option(
+    "--hemisphere-option",
+    type=click.Choice(
+        [h.name.lower() for h in layer_based_direction_vectors.HemisphereOppositeOption]
+    ),
+    default=layer_based_direction_vectors.HemisphereOppositeOption.NO_SPLIT,
+)
+@log_args(L)
+def source_target_layered_region(
+    annotation_path,
+    hierarchy_path,
+    output_path,
+    source,
+    region,
+    target,
+    algorithm,
+    hemisphere_option,
+):
+    """Generate and save the direction vectors for an arbitrary region
+    --source '@.*6[b]$'
+    --target "@.*1$"
+    --region VISpm
+    """
+    from atlas_direction_vectors.region import source_target_layered_region as stlr
+
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+    hemisphere_option = layer_based_direction_vectors.HemisphereOppositeOption[
+        hemisphere_option.upper()
+    ]
+
+    dir_vectors = stlr(
+        annotation,
+        region_map,
+        algorithm,
+        source,
+        region,
+        target,
+        hemisphere_option,
+    )
+    annotation.with_data(dir_vectors).save_nrrd(output_path)
