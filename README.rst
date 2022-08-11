@@ -10,7 +10,7 @@ They represent the directions of the fiber tracts and their streamlines are assu
 
 Direction vectors are used in placement-algorithm to set cells orientations.
 
-Direction vectors are also used to compute placement hints (see the placement_hints module) and split layer 2/3 of the AIBS mouse isocortex.
+Direction vectors are also used to compute placement hints and split layer 2/3 of the AIBS mouse isocortex.
 
 After installation, you can display the available command lines with the following ``bash`` command:
 
@@ -23,10 +23,35 @@ Installation
 
 .. code-block:: bash
 
-    git clone https://github.com/BlueBrain/atlas-direction-vectors
-    cd atlas-direction-vectors
-    pip install -e .
+    pip install atlas-direction-vectors
 
+Examples
+========
+
+Direction Vectors
+-----------------
+
+Get the required input files:
+
+.. code-block:: bash
+
+   mkdir -p data/ccfv3
+
+   # hierarchy file:
+   curl -o data/1.json http://api.brain-map.org/api/v2/structure_graph_download/1.json
+
+   # CCFv3 annotation volume:
+   curl -o data/ccfv3/annotation_25.nrrd http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2017/annotation_25.nrrd
+
+Run the code (note, depending on the resolution of the volume, this may require significant amounts of available RAM):
+
+.. code-block:: bash
+
+    atlas-direction-vectors direction-vectors isocortex \
+        --hierarchy-path data/1.json                    \
+        --annotation-path data/ccfv3/annotation_25.nrrd \
+        --algorithm shading-blur-gradient               \
+        --output-path data/ccfv3/direction_vectors.nrrd
 
 Instructions for developers
 ===========================
