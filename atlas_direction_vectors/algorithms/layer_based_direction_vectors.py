@@ -184,22 +184,22 @@ def compute_direction_vectors(
         if not isinstance(annotation, VoxelData):
             raise ValueError("`annotation` must be specified as a path or a VoxelData object.")
 
-    landscape = {
+    new_landscape = {
         "source": np.isin(
-            annotation.raw,  # type: ignore
+            annotation.raw,
             attributes_to_ids(region_map, landscape["source"]),
         ),
         "inside": np.isin(
-            annotation.raw,  # type: ignore
+            annotation.raw,
             attributes_to_ids(region_map, landscape["inside"]),
         ),
         "target": np.isin(
-            annotation.raw,  # type: ignore
+            annotation.raw,
             attributes_to_ids(region_map, landscape["target"]),
         ),
     }
     direction_vectors = direction_vectors_for_hemispheres(
-        landscape, algorithm, hemisphere_opposite_option, **kwargs
+        new_landscape, algorithm, hemisphere_opposite_option, **kwargs
     )
 
     return direction_vectors
@@ -406,12 +406,12 @@ def _expanded_boundary_shading(
 
     field = blur_gradient.compute_initial_field(layered_region, layer_to_weight)
 
-    shading_mask = np.zeros_like(layered_region, dtype=np.int8)
-    np.copyto(shading_mask, border_region_mask, where=initial_region_mask)
+    region_mask = np.zeros_like(layered_region, dtype=np.int8)
+    np.copyto(region_mask, border_region_mask, where=initial_region_mask)
 
-    shading_border = blur_gradient.shading_from_boundary(shading_mask, shading_complement)
+    shading_border = blur_gradient.shading_from_boundary(region_mask, shading_complement)
 
-    shading_mask = np.logical_and(
+    shading_mask: BoolArray = np.logical_and(
         shading_border > 0, np.logical_or(field == layer_to_weight[1], field == layer_to_weight[0])
     )
 

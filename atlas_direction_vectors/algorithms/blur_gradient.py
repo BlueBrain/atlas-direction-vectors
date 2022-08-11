@@ -22,7 +22,6 @@ the normalized gradient is returned.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
 
 import numpy as np
 from atlas_commons.typing import AnnotationT, NDArray
@@ -128,7 +127,10 @@ def shading_from_boundary(
 
 
 def _sequential_region_shading(
-    annotation_raw: AnnotationT, region_label: int, shading_target_label: int, shades: List[int]
+    annotation_raw: AnnotationT,
+    region_label: int,
+    shading_target_label: int,
+    shades: NDArray[np.integer],
 ) -> NDArray[np.integer]:
     """Grows a region outwards using morphological binary dilation.
 
