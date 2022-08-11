@@ -50,10 +50,8 @@ Run the code (note, depending on the resolution of the volume, this may require 
     atlas-direction-vectors direction-vectors isocortex \
         --hierarchy-path data/1.json                    \
         --annotation-path data/ccfv3/annotation_25.nrrd \
-        --output-path data/ccfv3/orientations.nrrd      \
-        --algorithm shading-blur-gradient
-
-The above outputs `data/ccfv3/orientations.nrrd`, which is a dataset as described in `OrientationField`_ for the isocortex.
+        --algorithm shading-blur-gradient               \
+        --output-path data/ccfv3/direction_vectors.nrrd
 
 Instructions for developers
 ===========================
@@ -76,5 +74,3 @@ The development of this software was supported by funding to the Blue Brain Proj
 For license and authors, see LICENSE.txt and AUTHORS.txt respectively.
 
 Copyright © 2022 Blue Brain Project/EPFL
-
-.. _`OrientationField`: https://voxcell.readthedocs.io/en/latest/orientation.html
