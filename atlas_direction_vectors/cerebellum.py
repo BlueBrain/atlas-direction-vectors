@@ -1,13 +1,10 @@
-"""Function computing the direction vectors of the AIBS mouse cerebellum
+"""Function computing the direction vectors of the AIBS mouse cerebellar cortex
 
 The algorithm creates a scalar field with low values in surfaces where fiber tracts are incoming
 and high values where fiber tracts are outgoing. The direction vectors are given by the gradient
 of this scalar field.
-
-Note: At the moment, direction vectors are generated only for the following cerebellum subregions:
-    - the flocculus
-    - the lingula
 """
+import logging
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -20,12 +17,13 @@ from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
 if TYPE_CHECKING:  # pragma: no cover
     from voxcell import RegionMap, VoxelData  # type: ignore
 
+L = logging.getLogger(__name__)
+logging.captureWarnings(True)
+
 
 def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
     """
     Computes cerebellum's direction vectors as the normalized gradient of a custom scalar field.
-
-    The computations are restricted to the flocculus and the lingula subregions.
 
     The output direction vector field is computed as the normalized gradient
     of a custom scalar field. This scalar field resembles a distance field in
@@ -33,10 +31,6 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
 
     Afterwards, a Gaussian filter is applied and the normalized gradient of the
     blurred scalar field is returned.
-
-    Note: For now, direction vectors are only computed for the flocculus and lingula subregions.
-        A voxel lying outside these two regions will be assigned a 3D vector
-        with np.nan coordinates.
 
     Arguments:
         region_map: hierarchy data structure of the AIBS atlas
@@ -46,90 +40,85 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
     Returns:
         numpy.ndarray of shape (annotation.shape, 3) holding a 3D unit vector field.
     """
-    flocculus_direction_vectors = _flocculus_direction_vectors(region_map, annotation)
-    lingula_direction_vectors = _lingula_direction_vectors(region_map, annotation)
-
-    # Assembles flocculus and lingula direction vectors.
-    direction_vectors = flocculus_direction_vectors
-    lingula_mask = np.logical_not(np.isnan(lingula_direction_vectors))
-    direction_vectors[lingula_mask] = lingula_direction_vectors[lingula_mask]
+    direction_vectors = np.full(annotation.raw.shape + (3,), np.nan, dtype=np.float32)
+    subregion_ids = []
+    for subregion_id in region_map.find(
+        "Cerebellar cortex", "name", with_descendants=True
+    ):
+        parent_id = region_map._parent[subregion_id]
+        if (
+            subregion_id in annotation.raw
+            and region_map.is_leaf_id(subregion_id)
+            and parent_id not in subregion_ids
+        ):
+            subregion_ids.append(parent_id)
+            L.info(
+                "Computing direction vectors for region %s.",
+                region_map.get(parent_id, "name"),
+            )
+            subregion_direction_vectors = cereb_subregion_direction_vectors(
+                parent_id, region_map, annotation
+            )
+            # Assembles subregion direction vectors.
+            subregion_mask = np.logical_not(np.isnan(subregion_direction_vectors))
+            direction_vectors[subregion_mask] = subregion_direction_vectors[subregion_mask]
 
     return direction_vectors
 
 
-def _flocculus_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
-    """Returns the directin vectors for the flocculus subregions
-
-    name: cerebellum related fiber tracts, acronym: cbf,  identifier = 960
-    name: Flocculus, granular layer, acronym: FLgr, identifier: 10690
-    name: Flocculus, purkinje layer, acronym: FLpu, identifier: 10691
-    name: Flocculus molecular layer, acronym: FLmo, identifier: 10692
+def cereb_subregion_direction_vectors(
+    region_id: int,
+    region_map: "RegionMap",
+    annotation: "VoxelData",
+    weights: dict = None,
+) -> FloatArray:
+    """Returns the direction vectors for a cerebellar cortex subregion
+    Arguments:
+        region_id: id of the cerebellar cortex subregion of interest
+        region_map: hierarchy data structure of the AIBS atlas
+        annotation: integer array of shape (W, H, D) holding the annotation of the whole mouse
+         brain.
+        weights: dictionary linking the cerebellar cortex regions' acronym ("mo", "pu", "gr", "cbf",
+         "outside_of_brain") to their weight in the custom scalar field (default is respectively:
+          1, 0, -1, -5, 3).
+    Returns:
+        numpy.ndarray of shape (annotation.shape, 3) holding a 3D unit vector field.
     """
+    if weights is None:
+        weights = {}
+    acronym = region_map.get(region_id, "acronym")
+    name = region_map.get(region_id, "name")
+
+    # first elem is molecular layer, last element is the fibers
     metadata = {
         "region": {
-            "name": "Extended Flocculus",
-            "query": r"@^\bFL|cbf\b$",
+            "name": "Cerebellar cortex subreg",
+            "query": rf"@^\b{acronym}|cbf\b$",
             "attribute": "acronym",
             "with_descendants": True,
         },
         "layers": {
             "names": [
-                "Flocculus, molecular layer",
-                "Flocculus, Purkinje layer",
-                "Flocculus, granular layer",
+                name + ", molecular layer",
+                name + ", Purkinje layer",
+                name + ", granular layer",
                 "cerebellum related fiber tracts",
             ],
-            "queries": ["FLmo", "FLpu", "FLgr", "cbf"],
+            "queries": [acronym + "mo", acronym + "pu", acronym + "gr", "cbf"],
             "attribute": "acronym",
             "with_descendants": True,
         },
     }
     region_to_weight = {
-        "cbf": -5,
-        "FLgr": -1,
-        "FLpu": 0,
-        "FLmo": 1,
-        "outside_of_brain": 3,
+        acronym + "mo": 1.0 if "mo" not in weights else weights["mo"],
+        acronym + "pu": 0.0 if "pu" not in weights else weights["pu"],
+        acronym + "gr": -1.0 if "gr" not in weights else weights["gr"],
+        "cbf": -5.0 if "cbf" not in weights else weights["cbf"],
+        "outside_of_brain": 3.0
+        if "outside_of_brain" not in weights
+        else weights["outside_of_brain"],
     }
-    return compute_layered_region_direction_vectors(
-        region_map=region_map,
-        annotation=annotation,
-        metadata=metadata,
-        region_to_weight=region_to_weight,
-        shading_width=4,
-        expansion_width=8,
-        has_hemispheres=False,
-    )
 
-
-def _lingula_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:
-    """Returns direction vectors for the lingula subregions
-
-    name: cerebellum related fiber tracts, acronym: cbf,  identifier = 960
-    name: Lingula molecular layer, acronym: LINGmo, identifier: 10707
-    name: Lingula, purkinje layer, acronym: LINGpu, identifier: 10706
-    name: Lingula, granular layer, acronym: LINGgr, identifier: 10705
-    """
-    metadata = {
-        "region": {
-            "name": "Extended Lingula",
-            "query": r"@^\bLING|cbf\b$",
-            "attribute": "acronym",
-            "with_descendants": True,
-        },
-        "layers": {
-            "names": [
-                "Lingula (I), molecular layer",
-                "Lingula (I), Purkinje layer",
-                "Lingula (I), granular layer",
-                "cerebellum related fiber tracts",
-            ],
-            "queries": ["LINGmo", "LINGpu", "LINGgr", "cbf"],
-            "attribute": "acronym",
-            "with_descendants": True,
-        },
-    }
-    region_to_weight = {"cbf": -5, "LINGgr": -1, "LINGpu": 0, "LINGmo": 1, "outside_of_brain": 3}
     return compute_layered_region_direction_vectors(
         region_map=region_map,
         annotation=annotation,

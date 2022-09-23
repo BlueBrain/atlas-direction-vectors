@@ -3,8 +3,7 @@
 import numpy as np  # type: ignore
 import quaternion  # type: ignore
 from atlas_commons.utils import FloatArray, NumericArray, normalize, zero_to_nan
-from scipy.ndimage.filters import gaussian_filter  # type: ignore
-from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
+from scipy.ndimage import gaussian_filter, generate_binary_structure  # type: ignore
 from scipy.signal import correlate  # type: ignore
 
 

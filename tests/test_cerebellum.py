@@ -204,13 +204,8 @@ def test_compute_cerebellum_direction_vectors(region_map, annotation):
     npt.assert_allclose(res, expected_direction_vectors.raw)
 
 
-def test_flocculus_direction_vectors(region_map, annotation):
+def test_cereb_subreg_direction_vectors(region_map, annotation):
 
-    res = tested._flocculus_direction_vectors(region_map, annotation)
+    res = tested.cereb_subregion_direction_vectors(region_map.find("FL", "acronym").pop(),
+                                                   region_map, annotation)
     _check_vectors_defined_in_regions(res, region_map, annotation, ["FLgr", "FLpu", "FLmo"])
-
-
-def test_lingula_direction_vectors(region_map, annotation):
-
-    res = tested._lingula_direction_vectors(region_map, annotation)
-    _check_vectors_defined_in_regions(res, region_map, annotation, ["LINGgr", "LINGpu", "LINGmo"])
