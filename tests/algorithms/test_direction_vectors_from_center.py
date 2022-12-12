@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
+
 from atlas_direction_vectors.algorithms.direction_vectors_from_center import (
-    compute_direction_vectors,
     compute_center_of_region,
+    compute_direction_vectors,
 )
 
 
