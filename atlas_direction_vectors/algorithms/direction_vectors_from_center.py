@@ -26,9 +26,7 @@ def compute_direction_vectors(
     direction_vectors = np.zeros((*region.shape, 3))
     for coordinates in np.ndindex(region.shape):
         if region[coordinates]:
-            direction_vectors[coordinates] = _normalize(
-                np.array(coordinates) - np.array(center)
-            )
+            direction_vectors[coordinates] = _normalize(np.array(coordinates) - np.array(center))
     return direction_vectors
 
 
