@@ -6,19 +6,15 @@ establieshed as pointing away from said point.
 
 This algorithm is intended to generate placeholder directions.
 """
-from typing import Optional
-
 import numpy as np
 import numpy.typing as npt
 from atlas_commons.typing import BoolArray
 from scipy import ndimage
 
-CENTER_OF_MOUSE_BRAIN = (148.6458536939575, 79.81845843864052, 113.88175413924235)
-
 
 def compute_direction_vectors(
     region: BoolArray,
-    center: Optional[npt.ArrayLike],
+    center: npt.ArrayLike,
 ) -> np.ndarray:
     """
     Computes within `region` direction vectors that aim away from the `center`.
@@ -31,9 +27,6 @@ def compute_direction_vectors(
         A vector field of float32 3D unit vectors over the input 3D volume.
 
     """
-    if center is None:
-        center = CENTER_OF_MOUSE_BRAIN
-
     direction_vectors = np.zeros((*region.shape, 3))
     for coordinates in np.ndindex(region.shape):
         if region[coordinates]:
