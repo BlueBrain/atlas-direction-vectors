@@ -23,7 +23,6 @@ setup(
         "atlas-commons>=0.1.4",
         "click>=7.0",
         "numpy>=1.15.0",
-        "numpy-quaternion[numba]>=2021.11.4.15.26.3",
         "scipy>=1.4.1",
         "voxcell>=3.0.0",
     ],
