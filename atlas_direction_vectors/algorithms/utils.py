@@ -1,10 +1,9 @@
 """Low-level tools for the computation of direction vectors"""
 
 import numpy as np  # type: ignore
-import quaternion  # type: ignore
-from atlas_commons.utils import FloatArray, NumericArray, normalize, zero_to_nan
-from scipy.ndimage.filters import gaussian_filter  # type: ignore
-from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
+from atlas_commons.utils import FloatArray, NumericArray, normalize
+from scipy.ndimage import gaussian_filter  # type: ignore
+from scipy.ndimage import generate_binary_structure  # type: ignore
 from scipy.signal import correlate  # type: ignore
 
 
@@ -37,24 +36,6 @@ def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0) -> Floa
     gradient = np.moveaxis(gradient, 0, -1)
     normalize(gradient)
     return gradient
-
-
-def quaternion_to_vector(quaternion_field: FloatArray) -> FloatArray:
-    """
-    Rotate the reference vector (0.0, 1.0, 0.0) by the quaternions of `quaternion_field`.
-
-    Arguments:
-        quaternion_field: float array of shape (W, L, D, 4),
-            the 4 quaternion coordinates are given by the last axis;
-            in other words, it is a quaternionic vector field on a 3D volume.
-
-    Returns:
-        A 3D vector field on a 3D volume under the form of a numpy.ndarray of shape
-        (W, L, D, 3).
-    """
-    quaternion_field = quaternion_field.copy()
-    zero_to_nan(quaternion_field)
-    return quaternion.rotate_vectors(quaternion.from_float_array(quaternion_field), (0.0, 1.0, 0.0))
 
 
 def _quaternion_from_vectors(  # pylint: disable=invalid-name
