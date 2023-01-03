@@ -15,7 +15,10 @@ from atlas_commons.app_utils import (
 
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
-from atlas_direction_vectors.algorithms import layer_based_direction_vectors
+from atlas_direction_vectors.algorithms import (
+    layer_based_direction_vectors,
+    direction_vectors_from_center,
+)
 from atlas_direction_vectors.algorithms.regiodesics import find_regiodesics_exec_or_raise
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.interpolation import interpolate_vectors
@@ -325,7 +328,7 @@ def layer_region(annotation_path, hierarchy_path, output_path, outside_brain, la
     help="Path of file to write the direction vectors to.",
 )
 @click.option("--source", type=str, help="atlas acronym to be used as the source")
-@click.option("--region", type=str, help="atlas acronum region of interest")
+@click.option("--region", type=str, help="atlas acronym region of interest")
 @click.option("--target", type=str, help="atlas acronym to be used as the target")
 @click.option("--algorithm", type=click.Choice(list(layer_based_direction_vectors.ALGORITHMS)))
 @click.option(
@@ -368,4 +371,23 @@ def source_target_layered_region(
         target,
         hemisphere_option,
     )
+    annotation.with_data(dir_vectors).save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@click.option("--region", type=str, help="atlas acronym for region of the direction vectors")
+@click.option("--center", type=(float, float), default=None)
+@log_args(L)
+def from_center(annotation_path, hierarchy_path, output_path, region, center):
+    """Generate and save the direction vectors for an arbitrary region"""
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+
+    dir_vectors = direction_vectors_from_center.command(region_map, annotation.raw, region, center)
     annotation.with_data(dir_vectors).save_nrrd(output_path)
