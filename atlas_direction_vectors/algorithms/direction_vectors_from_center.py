@@ -22,6 +22,9 @@ def command(
     region_accronym: str,
     center: Optional[numpy.typing.ArrayLike],
 ) -> np.ndarray:
+    """
+    Wrapper for `compute_direction_vectors` to be used in CLI.
+    """
     region_mask = get_region_mask(region_accronym, annotation, region_map)
 
     if center is None:
