@@ -382,7 +382,9 @@ def source_target_layered_region(
     help="Path of file to write the direction vectors to.",
 )
 @click.option("--region", type=str, help="atlas acronym for region of the direction vectors")
-@click.option("--center", type=(float, float), default=None)
+@click.option(
+    "--center", type=(float, float, float), default=None, help="example: --center 148.6 79.8 113.9"
+)
 @log_args(L)
 def from_center(annotation_path, hierarchy_path, output_path, region, center):
     """Generate and save the direction vectors for an arbitrary region"""
