@@ -16,8 +16,8 @@ from atlas_commons.app_utils import (
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
 from atlas_direction_vectors.algorithms import (
-    layer_based_direction_vectors,
     direction_vectors_from_center,
+    layer_based_direction_vectors,
 )
 from atlas_direction_vectors.algorithms.regiodesics import find_regiodesics_exec_or_raise
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
