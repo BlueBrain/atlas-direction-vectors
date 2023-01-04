@@ -6,14 +6,18 @@ establieshed as pointing away from said point.
 
 This algorithm is intended to generate placeholder directions.
 """
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
-import numpy.typing
 import voxcell
 from atlas_commons.typing import AnnotationT, BoolArray
 from atlas_commons.utils import get_region_mask
 from scipy import ndimage
+
+if TYPE_CHECKING:
+    import numpy.typing
 
 
 def command(
