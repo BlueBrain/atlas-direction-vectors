@@ -23,13 +23,13 @@ if TYPE_CHECKING:
 def command(
     region_map: voxcell.RegionMap,
     annotation: AnnotationT,
-    region_accronym: str,
+    region_acronym: str,
     center: Optional[numpy.typing.ArrayLike],
 ) -> np.ndarray:
     """
     Wrapper for `compute_direction_vectors` to be used in CLI.
     """
-    region_mask = get_region_mask(region_accronym, annotation, region_map)
+    region_mask = get_region_mask(region_acronym, annotation, region_map)
 
     if center is None:
         root_mask = get_region_mask("root", annotation, region_map)
