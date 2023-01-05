@@ -382,7 +382,7 @@ def source_target_layered_region(
     help="Path of file to write the direction vectors to.",
 )
 @click.option(
-    "--region", type=str, default="root", help="atlas acronym for region of the direction vectors"
+    "--region", type=str, required=True, help="atlas acronym for region of the direction vectors"
 )
 @click.option(
     "--center", type=(float, float, float), default=None, help="example: --center 148.6 79.8 113.9"
