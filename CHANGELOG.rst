@@ -5,7 +5,7 @@ Version 0.1.4
 -------------
 
 - Added `direction-vectors from-center` command; a placeholder way to generate
-  orientation vectors for a particular region, but supplying a central point,
+  orientation vectors for a particular region, by supplying a central point,
   and emanating away
 
 Version 0.1.2
