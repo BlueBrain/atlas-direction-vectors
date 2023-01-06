@@ -47,11 +47,24 @@ Run the code (note, depending on the resolution of the volume, this may require 
 
 .. code-block:: bash
 
-    atlas-direction-vectors direction-vectors isocortex \
+    atlas-direction-vectors direction-vectors           \
+        isocortex                                       \
         --hierarchy-path data/1.json                    \
         --annotation-path data/ccfv3/annotation_25.nrrd \
         --algorithm shading-blur-gradient               \
         --output-path data/ccfv3/direction_vectors.nrrd
+
+For the placeholder orientations, one can compute the vectors for a particular
+region with:
+
+.. code-block:: bash
+
+    atlas-direction-vectors direction-vectors           \
+    from-center                                         \
+        --region SSp                                    \
+        --hierarchy-path data/1.json                    \
+        --annotation-path data/ccfv3/annotation_25.nrrd \
+        --output-path placeholder-direction_vectors.nrrd
 
 Instructions for developers
 ===========================
