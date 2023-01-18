@@ -5,7 +5,7 @@ and high values where fiber tracts are outgoing. The direction vectors are given
 of this scalar field.
 """
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from atlas_commons.typing import FloatArray
@@ -42,20 +42,15 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
     """
     direction_vectors = np.full(annotation.raw.shape + (3,), np.nan, dtype=np.float32)
     subregion_ids = []
-    for subregion_id in region_map.find(
-        "Cerebellar cortex", "name", with_descendants=True
-    ):
-        parent_id = region_map._parent[subregion_id]
+    for subregion_id in region_map.find("Cerebellar cortex", "name", with_descendants=True):
+        parent_id = region_map.get(subregion_id, "parent_structure_id")
         if (
             subregion_id in annotation.raw
             and region_map.is_leaf_id(subregion_id)
             and parent_id not in subregion_ids
         ):
             subregion_ids.append(parent_id)
-            L.info(
-                "Computing direction vectors for region %s.",
-                region_map.get(parent_id, "name"),
-            )
+            L.info("Computing direction vectors for region %s.", region_map.get(parent_id, "name"))
             subregion_direction_vectors = cereb_subregion_direction_vectors(
                 parent_id, region_map, annotation
             )
@@ -67,10 +62,7 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
 
 
 def cereb_subregion_direction_vectors(
-    region_id: int,
-    region_map: "RegionMap",
-    annotation: "VoxelData",
-    weights: dict = None,
+    region_id: int, region_map: "RegionMap", annotation: "VoxelData", weights: Optional[dict] = None
 ) -> FloatArray:
     """Returns the direction vectors for a cerebellar cortex subregion
     Arguments:

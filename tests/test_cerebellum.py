@@ -206,6 +206,7 @@ def test_compute_cerebellum_direction_vectors(region_map, annotation):
 
 def test_cereb_subreg_direction_vectors(region_map, annotation):
 
-    res = tested.cereb_subregion_direction_vectors(region_map.find("FL", "acronym").pop(),
-                                                   region_map, annotation)
+    res = tested.cereb_subregion_direction_vectors(
+        region_map.find("FL", "acronym").pop(), region_map, annotation
+    )
     _check_vectors_defined_in_regions(res, region_map, annotation, ["FLgr", "FLpu", "FLmo"])
