@@ -33,26 +33,6 @@ def test_compute_blur_gradient():
         tested.compute_blur_gradient(scalar_field, 0.1)
 
 
-class Test_quaternion_to_vector:
-    def test_single_vector(self):
-        vectors = tested.quaternion_to_vector(np.array([1.0, 0.0, 0.0, 0.0]))
-        npt.assert_almost_equal(vectors, [0.0, 1.0, 0.0])
-        vectors = tested.quaternion_to_vector(np.array([1.0, 0.0, 0.0, -1.0]))
-        npt.assert_almost_equal(vectors, [1.0, 0.0, 0.0])
-        vectors = tested.quaternion_to_vector(np.array([1.0, 1.0, 0.0, 0.0]))
-        npt.assert_almost_equal(vectors, [0, 0, 1])
-        vectors = tested.quaternion_to_vector(np.array([1.0, 1.0, 0.0, 0.0]) * 2.0)
-        npt.assert_almost_equal(vectors, [0, 0, 1])
-
-    def test_identity_quaternion_gives_y(self):
-        vectors = tested.quaternion_to_vector(np.array([[[1.0, 0.0, 0.0, 0.0]]]))
-        npt.assert_almost_equal(vectors, [[[0.0, 1.0, 0.0]]])
-
-    def test_invert_quaternion_gives_negative_y(self):
-        vectors = tested.quaternion_to_vector(np.array([[[0.0, 1.0, 0.0, 0.0]]]))
-        npt.assert_almost_equal(vectors, [[[0, -1, 0]]])
-
-
 class Test_vector_to_quaternion:
     @pyt.mark.xfail
     def test_long_vector_gives_same_quat(self):
@@ -60,17 +40,6 @@ class Test_vector_to_quaternion:
             tested.vector_to_quaternion(np.array([[[1.0, 0.0, 0.0]]])),
             tested.vector_to_quaternion(np.array([[[5, 0, 0]]])),
         )
-
-
-def test_quaternion_converters_consistency():
-    vectors = normalized(
-        np.array([[1.0, 0.0, 0.0], [1.0, 2.0, 3.0], [3.0, 2.0, 3.0], [0.0, 2.0, 1.0]])
-    )
-    quaternions = tested.vector_to_quaternion(vectors)
-    npt.assert_almost_equal(tested.quaternion_to_vector(quaternions), vectors, decimal=3)
-    vectors = normalized(np.array([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]]))
-    quaternions = tested.vector_to_quaternion(vectors)
-    npt.assert_almost_equal(tested.quaternion_to_vector(quaternions), vectors, decimal=3)
 
 
 def test_compute_boundary():

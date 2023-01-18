@@ -47,11 +47,24 @@ Run the code (note, depending on the resolution of the volume, this may require 
 
 .. code-block:: bash
 
-    atlas-direction-vectors direction-vectors isocortex \
+    atlas-direction-vectors direction-vectors           \
+        isocortex                                       \
         --hierarchy-path data/1.json                    \
         --annotation-path data/ccfv3/annotation_25.nrrd \
         --algorithm shading-blur-gradient               \
         --output-path data/ccfv3/direction_vectors.nrrd
+
+For the placeholder orientations, one can compute the vectors for a particular
+region with:
+
+.. code-block:: bash
+
+    atlas-direction-vectors direction-vectors           \
+    from-center                                         \
+        --region SSp                                    \
+        --hierarchy-path data/1.json                    \
+        --annotation-path data/ccfv3/annotation_25.nrrd \
+        --output-path placeholder-direction_vectors.nrrd
 
 Instructions for developers
 ===========================
@@ -65,6 +78,14 @@ Run the following commands before submitting your code for review:
     black -l 100 atlas_direction_vectors tests setup.py
 
 These formatting operations will help you pass the linting check `testenv:lint` defined in `tox.ini`.
+
+Citation
+========
+
+When you use this software, we kindly ask you to cite the following DOI:
+
+.. image:: https://zenodo.org/badge/451806460.svg
+   :target: https://zenodo.org/badge/latestdoi/451806460
 
 Acknowledgements
 ================
