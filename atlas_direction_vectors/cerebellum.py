@@ -18,7 +18,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from voxcell import RegionMap, VoxelData  # type: ignore
 
 L = logging.getLogger(__name__)
-logging.captureWarnings(True)
 
 
 def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") -> FloatArray:

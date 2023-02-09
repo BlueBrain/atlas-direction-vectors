@@ -285,7 +285,12 @@ def compute_layered_region_direction_vectors(
 
     # example: ids[ids!=0] -> [1, 2, 3], layers -> [1, 2], external_id -> 3
     *layers, external_id = ids[ids != 0]
-
+    if len(ids[ids != 0]) != len(layer_queries):
+        raise AtlasDirectionVectorsError(
+            f"Layer region ids were not correctly assigned from the layer_queries\n"
+            f"Layered region ids: {ids}\n"
+            f"layer queries: {layer_queries}"
+        )
     layer_to_weight = _build_layered_region_weights(layer_queries, region_to_weight)
 
     # make a mask separating the first layer from the rest
