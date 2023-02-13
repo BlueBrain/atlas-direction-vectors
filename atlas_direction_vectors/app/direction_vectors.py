@@ -53,22 +53,15 @@ def app(verbose):
 )
 @log_args(L)
 def cerebellum(annotation_path, hierarchy_path, output_path):
-    """Generate and save the direction vectors of the AIBS mouse cerebellum.
+    """Generate and save the direction vectors of the AIBS mouse cerebellar cortex.
 
     This command relies on the computation of the gradient of a Gaussian blur
-    applied to specific parts of the cerebellum.
+    applied to specific parts of the cerebellar cortex.
 
     The output file is an nrrd file enclosing a float32 array of shape (W, H, D, 3)
     where (W, H, D) is the shape the input annotation array.
 
-    Note: At the moment, direction vectors are generated only for the following cerebellum
-    subregions:
-
-    \b
-        - the flocculus
-        - the lingula
-
-    The vector [nan, nan, nan] is assigned to any voxel outside the above two regions.
+    The vector [nan, nan, nan] is assigned to any voxel outside the cerebellar cortex.
 
     """
     annotation = voxcell.VoxelData.load_nrrd(annotation_path)

@@ -242,6 +242,8 @@ def compute_layered_region_direction_vectors(
     source region, and the outside of the brain as the target.
 
     Notes:
+        The first region in the `metadata[layers][queries]` is assumed to correspond to the target
+        layer of the fibers, on which the shading will be applied.
         The last region in the `metadata[layers][queries]` is assumed to correspond to an external
         group of regions that will be ommited from the final orientation field.
 
@@ -250,7 +252,7 @@ def compute_layered_region_direction_vectors(
         annotation: Full annotation array from which the region of interest `inside` will be
         metadata: dict describing the region of interest and its layers.
         region_to_weight: dict the keys of which are acronyms and the values weight integers
-        shading_width:
+        shading_width: Size of the shading to apply to the target region.
         expansion_width: The number of times to apply the region dilation on all layers.
         has_hemispheres: If true it splits the volume into two hemispheres, processing each one
             independently.
@@ -261,7 +263,7 @@ def compute_layered_region_direction_vectors(
     Notes:
         The parameter choice for shading_width and expansion_width are 4 and 8 respectively.
         The blurring helps to spread the weights that are assigned to the fields. For the weights
-        of the shading (border_region) there is a strong gradient with the ouside (0 -> >10), which
+        of the shading (border_region) there is a strong gradient with the outside (0 -> >10), which
         means there is a strong gradient inwards the region despite the width of the shading. To
         fix this the shading size must be reduced but should remain greater than sigma=3 so that
         inside the region it will not affect by the outside, hence 4. Then to prevent a strong
@@ -280,16 +282,15 @@ def compute_layered_region_direction_vectors(
     layered_region = create_layered_volume(annotation.raw, region_map, metadata)
 
     ids = np.unique(layered_region)
+
+    # example: ids[ids!=0] -> [1, 2, 3], layers -> [1, 2], external_id -> 3
+    *layers, external_id = ids[ids != 0]
     if len(ids[ids != 0]) != len(layer_queries):
         raise AtlasDirectionVectorsError(
             f"Layer region ids were not correctly assigned from the layer_queries\n"
             f"Layered region ids: {ids}\n"
             f"layer queries: {layer_queries}"
         )
-
-    # example: ids[ids!=0] -> [1, 2, 3], layers -> [1, 2], external_id -> 3
-    *layers, external_id = ids[ids != 0]
-
     layer_to_weight = _build_layered_region_weights(layer_queries, region_to_weight)
 
     # make a mask separating the first layer from the rest
