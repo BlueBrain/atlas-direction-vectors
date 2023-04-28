@@ -7,7 +7,8 @@ from scipy.ndimage import generate_binary_structure  # type: ignore
 from scipy.signal import correlate  # type: ignore
 
 
-def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0) -> FloatArray:
+def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0,
+                          gaussian_radius=None) -> FloatArray:
     """
     Blurs a scalar field and returns its normalized gradient.
 
@@ -20,6 +21,10 @@ def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0) -> Floa
             a 3D volume.
         gaussian_stddev: standard deviation of the Gaussian kernel used by the
             Gaussian filter.
+        gaussian_radius: radius of the Gaussian kernel used by the
+            Gaussian filter. If 'None' is passed, the default behavior is used:
+            the radius of the kernel is automatically truncated at (4.0 *
+            gaussian_stddev).
     Returns:
         numpy.ndarray of float type. A 3D unit vector field over the underlying 3D volume
         of the input scalar field. This vector contains np.nan vectors if the normalization
@@ -31,7 +36,7 @@ def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0) -> Floa
         raise ValueError(
             f"The input field must be of floating point type. Got {scalar_field.dtype}."
         )
-    blurred = gaussian_filter(scalar_field, sigma=gaussian_stddev)
+    blurred = gaussian_filter(scalar_field, sigma=gaussian_stddev, radius=gaussian_radius)
     gradient = np.array(np.gradient(blurred))
     gradient = np.moveaxis(gradient, 0, -1)
     normalize(gradient)

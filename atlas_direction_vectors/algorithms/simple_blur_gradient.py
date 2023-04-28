@@ -22,6 +22,7 @@ def compute_direction_vectors(
     sigma: float = 10.0,
     source_weight: float = -1.0,
     target_weight: float = 1.0,
+    radius = None,
 ) -> NDArray[np.float32]:
     """
     Compute direction vectors in the `inside` volume.
@@ -45,6 +46,10 @@ def compute_direction_vectors(
             float value to be assigned to all voxels in `source`. Defaults to -1.0.
         target_weight:
             float value to be assigned to all voxels in `target`. Defaults to 1.0.
+        radius:
+            radius of the Gaussian kernel used for truncation. If 'None' is
+            passed, the default behavior is used: the radius of the kernel is
+            automatically truncated at (4.0 * sigma). Defaults to None.
 
     Returns:
         Array holding a vector field of unit vectors defined on the `inside` 3D volume. The shape
@@ -58,7 +63,9 @@ def compute_direction_vectors(
     scalar_field[source] = source_weight
     scalar_field[target] = target_weight
 
-    direction_vectors = compute_blur_gradient(scalar_field, gaussian_stddev=sigma)
+    direction_vectors = compute_blur_gradient(scalar_field,
+                                              gaussian_stddev=sigma,
+                                              gaussian_radius=radius)
     direction_vectors[~inside, :] = np.nan
 
     return direction_vectors
