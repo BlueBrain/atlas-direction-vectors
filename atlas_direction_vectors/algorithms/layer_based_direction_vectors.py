@@ -62,7 +62,7 @@ def attributes_to_ids(
 
     """
     ids = set()
-    for (attribute, value) in attributes:
+    for attribute, value in attributes:
         ids |= region_map.find(value, attribute, ignore_case=False, with_descendants=True)
     return list(ids)
 
@@ -309,7 +309,6 @@ def compute_layered_region_direction_vectors(
     direction_vectors = np.full(annotation.raw.shape + (3,), np.nan, dtype=np.float32)
 
     if has_hemispheres:
-
         for hemisphere_mask in split_into_halves(np.full(annotation.raw.shape, True, dtype=bool)):
             layered_hemisphere = np.zeros_like(hemisphere_mask, dtype=np.uint8)
             np.copyto(layered_hemisphere, layered_region, where=hemisphere_mask)
@@ -326,7 +325,6 @@ def compute_layered_region_direction_vectors(
             direction_vectors[hemisphere_mask, :] = hemi_direction_vectors[hemisphere_mask, :]
 
     else:
-
         direction_vectors[:] = _expanded_boundary_shading(
             layered_region,
             layers,

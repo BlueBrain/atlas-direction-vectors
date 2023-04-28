@@ -8,7 +8,6 @@ from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 
 def _print_arrays(*arrays):
     class Colors:
-
         RED = "\u001b[31m"
         CYAN = "\u001b[36m"
         GREEN = "\u001b[32m"
@@ -45,7 +44,6 @@ def _print_arrays(*arrays):
 
 @pytest.fixture
 def annotation():
-
     raw = np.zeros((6, 8, 8), dtype=np.int32)
 
     raw[(1, 2), 2:6, 2:6] = 1
@@ -55,7 +53,6 @@ def annotation():
 
 
 def test_region_dilation(annotation):
-
     actual_mask = tested.region_dilation(annotation, region_label=1, shading_target_label=0)
 
     expected_mask = np.array(
@@ -206,7 +203,6 @@ def test_region_dilation(annotation):
 
 
 def test_sequential_region_shading(annotation):
-
     res = tested._sequential_region_shading(
         annotation, region_label=2, shading_target_label=0, shades=[5, 4]
     )
@@ -281,7 +277,6 @@ def test_sequential_region_shading(annotation):
 
 
 def test_shading_from_boundary():
-
     input_mask = np.array(
         [
             [

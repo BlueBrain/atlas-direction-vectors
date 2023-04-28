@@ -22,7 +22,7 @@ def compute_direction_vectors(
     sigma: float = 10.0,
     source_weight: float = -1.0,
     target_weight: float = 1.0,
-    radius = None,
+    radius=None,
 ) -> NDArray[np.float32]:
     """
     Compute direction vectors in the `inside` volume.
@@ -63,9 +63,9 @@ def compute_direction_vectors(
     scalar_field[source] = source_weight
     scalar_field[target] = target_weight
 
-    direction_vectors = compute_blur_gradient(scalar_field,
-                                              gaussian_stddev=sigma,
-                                              gaussian_radius=radius)
+    direction_vectors = compute_blur_gradient(
+        scalar_field, gaussian_stddev=sigma, gaussian_radius=radius
+    )
     direction_vectors[~inside, :] = np.nan
 
     return direction_vectors

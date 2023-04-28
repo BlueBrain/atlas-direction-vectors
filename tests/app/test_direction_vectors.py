@@ -41,10 +41,8 @@ def test_thalamus():
 
 
 def test_cerebellum():
-
     runner = CliRunner()
     with runner.isolated_filesystem():
-
         cerebellum_raw = np.zeros((8, 8, 8))
         for x_index, region_id in enumerate([10707, 10692, 10706, 10691, 10705, 10690, 744, 728]):
             cerebellum_raw[x_index, :, :] = region_id

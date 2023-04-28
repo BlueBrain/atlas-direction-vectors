@@ -7,8 +7,9 @@ from scipy.ndimage import generate_binary_structure  # type: ignore
 from scipy.signal import correlate  # type: ignore
 
 
-def compute_blur_gradient(scalar_field: FloatArray, gaussian_stddev=3.0,
-                          gaussian_radius=None) -> FloatArray:
+def compute_blur_gradient(
+    scalar_field: FloatArray, gaussian_stddev=3.0, gaussian_radius=None
+) -> FloatArray:
     """
     Blurs a scalar field and returns its normalized gradient.
 

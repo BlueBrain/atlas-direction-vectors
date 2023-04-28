@@ -145,7 +145,6 @@ def _acronyms_to_flattened_identifiers(region_map, acronyms):
 
 
 def _check_vectors_defined_in_regions(direction_vectors, region_map, annotation, acronyms):
-
     assert direction_vectors.shape == annotation.raw.shape + (3,)
 
     # The region of interest should not have nan value
@@ -165,7 +164,6 @@ def _check_vectors_defined_in_regions(direction_vectors, region_map, annotation,
 def _check_vectors_direction_dominance(
     direction_vectors, region_map, annotation, acronyms, direction
 ):
-
     region_mask = np.isin(annotation.raw, _acronyms_to_flattened_identifiers(region_map, acronyms))
 
     region_vectors = direction_vectors[region_mask, :]
@@ -183,7 +181,6 @@ def _check_vectors_direction_dominance(
 
 
 def test_compute_cerebellum_direction_vectors(region_map, annotation):
-
     res = tested.compute_direction_vectors(region_map, annotation)
     _check_vectors_defined_in_regions(
         res, region_map, annotation, ["FLgr", "FLpu", "FLmo"] + ["LINGgr", "LINGpu", "LINGmo"]
@@ -205,7 +202,6 @@ def test_compute_cerebellum_direction_vectors(region_map, annotation):
 
 
 def test_cereb_subreg_direction_vectors(region_map, annotation):
-
     res = tested.cereb_subregion_direction_vectors(
         region_map.find("FL", "acronym").pop(), region_map, annotation
     )

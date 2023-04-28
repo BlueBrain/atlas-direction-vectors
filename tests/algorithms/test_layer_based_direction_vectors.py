@@ -420,7 +420,6 @@ class Test_compute_direction_vectors:
 
 
 def test_build_layered_region_weights():
-
     regions = ["r1", "r2", "r3"]
     region_to_weight = {"r1": -1, "r2": 0, "r3": 1, "outside_of_brain": -2}
 
@@ -430,7 +429,6 @@ def test_build_layered_region_weights():
 
 
 def test_compute_layered_direction_vectors():
-
     metadata = {"layers": {"queries": ["q1", "q2"]}}
     region_to_weight = {"q1": 1, "q3": 2}
 

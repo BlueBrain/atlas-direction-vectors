@@ -21,7 +21,6 @@ def region_map():
 
 
 def _check_vectors_direction_dominance(direction_vectors, annotation, direction):
-
     region_mask = annotation.raw > 983
 
     region_vectors = direction_vectors[region_mask, :]
@@ -122,7 +121,6 @@ def test_compute_direction_vectors_with_missing_bottom(region_map):
 
 
 def test_compute_directions__shading_gradient(region_map):
-
     raw = np.zeros((20, 30, 20), dtype=np.int32)
 
     raw[6:14, (6, 7), 6:14] = 983
