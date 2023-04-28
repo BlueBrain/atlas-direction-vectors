@@ -69,7 +69,7 @@ def compute_direction_vectors(
     landscape = {
         "source": np.zeros_like(thalamus_mask),
         "inside": reticular_nucleus_complement_mask,
-        "target": common_outer_boundary_mask,
+        "target": reticular_nucleus_mask,
     }
     ratio = (
         brain_regions.voxel_dimensions[0] / 25
@@ -77,24 +77,27 @@ def compute_direction_vectors(
     rt_complement_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
-        # The constants below have been derived empirically by Hugo Dictus
-        sigma=ratio * 18.0,
-        source_weight=-2.0 * 0.9999999,
-        target_weight=2 * 0.1111111,
+        hemisphere_opposite_option=(HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE),
+        # The use of this algorithm was initially done by Hugo Dictus
+        # The constants below have been derived using trial-and-error by Austin Soplata
+        sigma=ratio * 9.0,
+        source_weight=0,
+        target_weight=1,
+        radius=100,
     )
     landscape = {
-        "source": reticular_nucleus_complement_mask,
+        "source": common_outer_boundary_mask,
         "inside": reticular_nucleus_mask,
-        "target": common_outer_boundary_mask,
+        "target": reticular_nucleus_complement_mask,
     }
     rt_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
-        # The constants below have been derived empirically by Hugo Dictus
+        hemisphere_opposite_option=(HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE),
+        # The use of this algorithm was initially done by Hugo Dictus
+        # The constants below have been derived using trial-and-error by Austin Soplata
         sigma=ratio * 5.0,
-        source_weight=-1,
+        source_weight=0,
         target_weight=1,
     )
 
