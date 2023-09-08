@@ -70,7 +70,7 @@ def compute_direction_vectors(
     landscape = {
         "source": np.zeros_like(thalamus_mask),
         "inside": reticular_nucleus_complement_mask,
-        "target": reticular_nucleus_mask,
+        "target": common_outer_boundary_mask,
     }
     ratio = (
         brain_regions.voxel_dimensions[0] / 25
