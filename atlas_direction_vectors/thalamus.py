@@ -62,6 +62,7 @@ def compute_direction_vectors(
         Vector field of 3D unit vectors over the thalamus volume with the same shape
         as the input one. Voxels outside the thalamus have np.nan coordinates.
     """
+
     thalamus_mask = get_region_mask("TH", brain_regions.raw, region_map)
     reticular_nucleus_mask = get_region_mask("RT", brain_regions.raw, region_map)
     reticular_nucleus_complement_mask = np.logical_and(thalamus_mask, ~reticular_nucleus_mask)
@@ -77,25 +78,30 @@ def compute_direction_vectors(
     rt_complement_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
-        # The constants below have been derived empirically by Hugo Dictus
-        sigma=ratio * 18.0,
-        source_weight=-2.0 * 0.9999999,
-        target_weight=2 * 0.1111111,
+        hemisphere_opposite_option=(HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE),
+        # The use of this algorithm was initially done by Hugo Dictus
+        # The constants below have been changed using trial-and-error by Austin Soplata
+        sigma=ratio * 9.0,
+        source_weight=0,
+        target_weight=1,
+        radius=100,
     )
+
     landscape = {
         "source": reticular_nucleus_complement_mask,
         "inside": reticular_nucleus_mask,
         "target": common_outer_boundary_mask,
     }
+
     rt_direction_vectors = direction_vectors_for_hemispheres(
         landscape,
         algorithm="simple-blur-gradient",
-        hemisphere_opposite_option=(HemisphereOppositeOption.INCLUDE_AS_SOURCE),
-        # The constants below have been derived empirically by Hugo Dictus
-        sigma=ratio * 5.0,
-        source_weight=-1,
-        target_weight=1,
+        hemisphere_opposite_option=(HemisphereOppositeOption.IGNORE_OPPOSITE_HEMISPHERE),
+        # The use of this algorithm was initially done by Hugo Dictus
+        # The constants below have been changed using trial-and-error by Austin Soplata
+        sigma=ratio * 8.0,
+        source_weight=-0.2,
+        target_weight=0,
     )
 
     direction_vectors = np.full(rt_direction_vectors.shape, np.nan, dtype=np.float32)

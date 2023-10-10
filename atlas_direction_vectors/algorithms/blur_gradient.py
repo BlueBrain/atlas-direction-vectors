@@ -156,7 +156,6 @@ def _sequential_region_shading(
     shading_mask = np.zeros_like(annotation_raw)
 
     for shading_value in shades:
-
         boundary_mask = region_dilation(
             annotation_raw=region_mask,
             region_label=region_label,

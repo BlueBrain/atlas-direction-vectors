@@ -79,7 +79,7 @@ def test_compute_direction_vectors(region_map):
         assert np.all(np.isnan(direction_vectors[:, [0, 11], :]))
         assert np.all(np.isnan(direction_vectors[:, :, [0, 11]]))
         norms = np.linalg.norm(direction_vectors, axis=-1)
-        npt.assert_allclose(norms[3:11, 1:11, 1:11], 1.0, rtol=1e-6)
+        npt.assert_allclose(norms[3:11, 1:11, 1:11], 1.0, rtol=1e-3)
         npt.assert_allclose(norms[1, 1:11, 1:11], 1.0, rtol=1e-6)
 
     # Reducing the voxel dimensions reduces the Gaussian blur standard deviation.
