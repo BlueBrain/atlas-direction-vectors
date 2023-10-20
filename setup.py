@@ -23,7 +23,7 @@ setup(
         "atlas-commons>=0.1.4",
         "click>=7.0",
         "numpy>=1.15.0",
-        "scipy>=1.4.1",
+        "scipy>=1.10.0",
         "voxcell>=3.0.0",
     ],
     extras_require={
