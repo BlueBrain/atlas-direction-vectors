@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.1.5
+-------------
+- This updates Scipy for gaussian_filter (#20)
+- Update thalamus (#18)
+- Update condition for error from layer queries. Fix #16 (#17)
+
 Version 0.1.4
 -------------
 
