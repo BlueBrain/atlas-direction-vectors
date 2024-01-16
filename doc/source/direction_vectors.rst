@@ -5,4 +5,3 @@ Direction vectors
 
 .. click:: atlas_direction_vectors.app.direction_vectors:app
     :prog: direction_vectors
-    :nested: full
