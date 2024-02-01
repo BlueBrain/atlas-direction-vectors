@@ -14,6 +14,7 @@ from atlas_commons.app_utils import (
 )
 
 from atlas_direction_vectors import cerebellum as cerebellum_
+from atlas_direction_vectors import olfactory_bulb as olfactory_bulb_
 from atlas_direction_vectors import thalamus as thalamus_
 from atlas_direction_vectors.algorithms import (
     direction_vectors_from_center,
@@ -67,6 +68,32 @@ def cerebellum(annotation_path, hierarchy_path, output_path):
     annotation = voxcell.VoxelData.load_nrrd(annotation_path)
     region_map = voxcell.RegionMap.load_json(hierarchy_path)
     dir_vectors = cerebellum_.compute_direction_vectors(region_map, annotation)
+    annotation.with_data(dir_vectors).save_nrrd(output_path)
+
+
+@app.command()
+@common_atlas_options
+@click.option(
+    "--output-path",
+    required=True,
+    help="Path of file to write the direction vectors to.",
+)
+@log_args(L)
+def olfactory_bulb(annotation_path, hierarchy_path, output_path):
+    """Generate and save the direction vectors of the AIBS mouse olfactory bulb.
+
+    This command relies on the computation of the gradient of a Gaussian blur
+    applied to specific parts of the olfactory bulb.
+
+    The output file is an nrrd file enclosing a float32 array of shape (W, H, D, 3)
+    where (W, H, D) is the shape the input annotation array.
+
+    The vector [nan, nan, nan] is assigned to any voxel outside the olfactory bulb.
+
+    """
+    annotation = voxcell.VoxelData.load_nrrd(annotation_path)
+    region_map = voxcell.RegionMap.load_json(hierarchy_path)
+    dir_vectors = olfactory_bulb_.compute_direction_vectors(region_map, annotation)
     annotation.with_data(dir_vectors).save_nrrd(output_path)
 
 
