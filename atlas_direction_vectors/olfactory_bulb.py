@@ -38,17 +38,17 @@ def compute_direction_vectors(region_map: RegionMap, annotation: VoxelData) -> N
         "layers": {
             "names": [
                 "glomerular",
-                "granule",
-                "inner_plexiform",
-                "mitral",
                 "outer_plexiform",
+                "mitral",
+                "inner_plexiform",
+                "granule",
             ],
             "queries": [
                 "MOBgl",
-                "MOBgr",
-                "MOBipl",
-                "MOBmi",
                 "MOBopl",
+                "MOBmi",
+                "MOBipl",
+                "MOBgr",
             ],
             "attribute": "acronym",
             "with_descendants": True,
@@ -56,10 +56,10 @@ def compute_direction_vectors(region_map: RegionMap, annotation: VoxelData) -> N
     }
     region_to_weight = {
         "MOBgl": 5,
-        "MOBgr": 4,
-        "MOBipl": 3,
-        "MOBmi": 2,
-        "MOBopl": 1,
+        "MOBopl": 4,
+        "MOBmi": 3,
+        "MOBipl": 2,
+        "MOBgr": 1,
         "outside_of_brain": 0,
     }
 
