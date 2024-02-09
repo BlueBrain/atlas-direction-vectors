@@ -11,7 +11,7 @@
 import os
 import sys
 
-from pkg_resources import get_distribution
+import importlib.metadata
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -52,7 +52,7 @@ project = 'atlas-direction-vectors'
 # built documents.
 #
 # The short X.Y version.
-version = get_distribution(project).version
+version = importlib.metadata.version(project)
 # The full version, including alpha/beta/rc tags.
 release = version
 
