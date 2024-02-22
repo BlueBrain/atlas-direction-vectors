@@ -4,9 +4,12 @@ The algorithm creates a scalar field with low values in surfaces where fiber tra
 and high values where fiber tracts are outgoing. The direction vectors are given by the gradient
 of this scalar field.
 """
+
 import logging
 from typing import TYPE_CHECKING, Optional
+from functools import partial
 
+from joblib import Parallel, delayed
 import numpy as np
 from atlas_commons.typing import FloatArray
 
@@ -49,10 +52,16 @@ def compute_direction_vectors(region_map: "RegionMap", annotation: "VoxelData") 
             and parent_id not in subregion_ids
         ):
             subregion_ids.append(parent_id)
-            L.info("Computing direction vectors for region %s.", region_map.get(parent_id, "name"))
-            subregion_direction_vectors = cereb_subregion_direction_vectors(
-                parent_id, region_map, annotation
-            )
+    L.info(
+        "Computing direction vectors for regions %s.",
+        [region_map.get(parent_id, "name") for parent_id in subregion_ids],
+    )
+
+    f = partial(cereb_subregion_direction_vectors, region_map=region_map, annotation=annotation)
+    with Parallel(n_jobs=-1, verbose=10) as parallel:
+        for subregion_direction_vectors in parallel(
+            delayed(f)(parent_id) for parent_id in subregion_ids
+        ):
             # Assembles subregion direction vectors.
             subregion_mask = np.logical_not(np.isnan(subregion_direction_vectors))
             direction_vectors[subregion_mask] = subregion_direction_vectors[subregion_mask]
@@ -91,23 +100,19 @@ def cereb_subregion_direction_vectors(
         "layers": {
             "names": [
                 name + ", molecular layer",
-                name + ", Purkinje layer",
                 name + ", granular layer",
                 "cerebellum related fiber tracts",
             ],
-            "queries": [acronym + "mo", acronym + "pu", acronym + "gr", "cbf"],
+            "queries": [acronym + "mo", acronym + "gr", "cbf"],
             "attribute": "acronym",
             "with_descendants": True,
         },
     }
     region_to_weight = {
-        acronym + "mo": 1.0 if "mo" not in weights else weights["mo"],
-        acronym + "pu": 0.0 if "pu" not in weights else weights["pu"],
-        acronym + "gr": -1.0 if "gr" not in weights else weights["gr"],
-        "cbf": -5.0 if "cbf" not in weights else weights["cbf"],
-        "outside_of_brain": 3.0
-        if "outside_of_brain" not in weights
-        else weights["outside_of_brain"],
+        acronym + "mo": weights.get("mo", 1.0),
+        acronym + "gr": weights.get("gr", -1.0),
+        "cbf": weights.get("cbf", -5.0),
+        "outside_of_brain": weights.get("outside_of_brain", 3),
     }
 
     return compute_layered_region_direction_vectors(
@@ -117,5 +122,5 @@ def cereb_subregion_direction_vectors(
         region_to_weight=region_to_weight,
         shading_width=4,
         expansion_width=8,
-        has_hemispheres=False,
+        has_hemispheres=True,
     )

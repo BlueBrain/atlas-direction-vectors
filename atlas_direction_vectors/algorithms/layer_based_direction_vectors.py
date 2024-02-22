@@ -15,6 +15,7 @@ shells, a.k.a lower and upper shells.
 
 This script is used to compute the mouse isocortex and the mouse thalamus directions vectors.
 """
+
 from __future__ import annotations
 
 import enum
@@ -331,7 +332,6 @@ def compute_layered_region_direction_vectors(
             layer_to_weight,
             border_region_mask,
             shading_complement,
-            expansion_width,
         )
 
     # remove the grown regions into the void from the dilation and the external_id values
