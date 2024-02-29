@@ -25,6 +25,7 @@ setup(
         "numpy>=1.15.0",
         "scipy>=1.10.0",
         "voxcell>=3.0.0",
+        "joblib>=1.3"
     ],
     extras_require={
         "tests": [

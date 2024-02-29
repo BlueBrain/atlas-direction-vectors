@@ -332,6 +332,7 @@ def compute_layered_region_direction_vectors(
             layer_to_weight,
             border_region_mask,
             shading_complement,
+            expansion_width,
         )
 
     # remove the grown regions into the void from the dilation and the external_id values
