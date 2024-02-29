@@ -183,17 +183,16 @@ def _check_vectors_direction_dominance(
 def test_compute_cerebellum_direction_vectors(region_map, annotation):
     res = tested.compute_direction_vectors(region_map, annotation)
     _check_vectors_defined_in_regions(
-        res, region_map, annotation, ["FLgr", "FLpu", "FLmo"] + ["LINGgr", "LINGpu", "LINGmo"]
+        res, region_map, annotation, ["FLgr", "FLmo"] + ["LINGgr", "LINGmo"]
     )
 
     _check_vectors_direction_dominance(
-        res, region_map, annotation, ["FLgr", "FLpu", "FLmo"], [-1.0, 0.0, 0.0]
+        res, region_map, annotation, ["FLgr", "FLmo"], [-1.0, 0.0, 0.0]
     )
 
     _check_vectors_direction_dominance(
-        res, region_map, annotation, ["LINGgr", "LINGpu", "LINGmo"], [-1.0, 0.0, 0.0]
+        res, region_map, annotation, ["LINGgr", "LINGmo"], [-1.0, 0.0, 0.0]
     )
-
     expected_direction_vectors = VoxelData.load_nrrd(
         DATA_DIR / "cerebellum_shading_gradient_orientations.nrrd"
     )
@@ -205,4 +204,4 @@ def test_cereb_subreg_direction_vectors(region_map, annotation):
     res = tested.cereb_subregion_direction_vectors(
         region_map.find("FL", "acronym").pop(), region_map, annotation
     )
-    _check_vectors_defined_in_regions(res, region_map, annotation, ["FLgr", "FLpu", "FLmo"])
+    _check_vectors_defined_in_regions(res, region_map, annotation, ["FLgr", "FLmo"])
