@@ -6,12 +6,12 @@ of this scalar field.
 """
 
 import logging
-from typing import TYPE_CHECKING, Optional
 from functools import partial
+from typing import TYPE_CHECKING, Optional
 
-from joblib import Parallel, delayed
 import numpy as np
 from atlas_commons.typing import FloatArray
+from joblib import Parallel, delayed
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
     compute_layered_region_direction_vectors,
