@@ -4,9 +4,12 @@ import logging
 from typing import Union
 
 import numpy as np  # type: ignore
+import pyquaternion as pyq
 from atlas_commons.utils import FloatArray, NumericArray, normalize
+from joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter  # type: ignore
 from scipy.ndimage import generate_binary_structure  # type: ignore
+from scipy.optimize import minimize
 from scipy.signal import correlate  # type: ignore
 
 L = logging.getLogger(__name__)
@@ -74,10 +77,6 @@ def _quaternion_from_vectors(  # pylint: disable=invalid-name
 
     if align_to is not None:
         target_dir = {"x": np.array([1.0, 0.0, 0.0]), "z": np.array([0.0, 0.0, 1.0])}[align_to]
-
-        import pyquaternion as pyq
-        from joblib import Parallel, delayed
-        from scipy.optimize import minimize
 
         def rotate_q(_q):
             q = pyq.Quaternion(_q)
