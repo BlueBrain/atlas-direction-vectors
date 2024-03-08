@@ -548,9 +548,6 @@ def from_config(annotation_path, hierarchy_path, output_path, config_path):
     direction_vectors = np.full(annotation.raw.shape + (3,), np.nan, dtype=np.float32)
 
     for region, region_config in config.items():
-        if region == "cerebellum":
-            continue
-
         region_ids = _get_region_ids(region, region_map, region_config, annotation)
         L.info("Computing direction vectors for %s with %s subregions.", region, len(region_ids))
         f = partial(
