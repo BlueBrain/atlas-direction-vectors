@@ -4,13 +4,11 @@
 import json
 import logging
 from copy import copy
-import numpy as np
 from functools import partial
-from joblib import Parallel, delayed
 
 import click  # type: ignore
+import numpy as np
 import voxcell  # type: ignore
-from atlas_commons.utils import compute_halfway
 from atlas_commons.app_utils import (
     EXISTING_FILE_PATH,
     assert_meta_properties,
@@ -18,6 +16,8 @@ from atlas_commons.app_utils import (
     log_args,
     set_verbose,
 )
+from atlas_commons.utils import compute_halfway
+from joblib import Parallel, delayed
 
 from atlas_direction_vectors import cerebellum as cerebellum_
 from atlas_direction_vectors import thalamus as thalamus_
@@ -25,13 +25,13 @@ from atlas_direction_vectors.algorithms import (
     direction_vectors_from_center,
     layer_based_direction_vectors,
 )
+from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
+    compute_layered_region_direction_vectors,
+)
 from atlas_direction_vectors.algorithms.regiodesics import find_regiodesics_exec_or_raise
 from atlas_direction_vectors.exceptions import AtlasDirectionVectorsError
 from atlas_direction_vectors.interpolation import interpolate_vectors
 from atlas_direction_vectors.isocortex import ISOCORTEX_ALGORITHMS
-from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
-    compute_layered_region_direction_vectors,
-)
 
 L = logging.getLogger(__name__)
 
@@ -484,9 +484,9 @@ DEFAULT_CONFIG = {
             },
         },
         "region_to_weight": {
-            "*mo": 1.0,
-            "*pu": 0.0,
-            "*gr": -1.0,
+            "***mo": 1.0,
+            "***pu": 0.0,
+            "***gr": -1.0,
             "cbf": -5.0,
             "outside_of_brain": 3.0,
         },
