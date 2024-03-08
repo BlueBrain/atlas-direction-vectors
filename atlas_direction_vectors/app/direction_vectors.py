@@ -425,7 +425,7 @@ def _create_subregion_direction_vectors(region_id, region_config, region_map, an
     annot[np.isin(annotation.raw, subregion_ids)] = 1
 
     has_hemisphere = not any(annot[:, :, z_halfway - 1 : z_halfway + 1].flatten())
-    L.info("Subregion %s has hemispheres: %s", region_map.get(region_id, "name"), has_hemisphere)
+    L.debug("Subregion %s has hemispheres: %s", region_map.get(region_id, "name"), has_hemisphere)
 
     return compute_layered_region_direction_vectors(
         region_map=region_map,
@@ -463,6 +463,69 @@ def _get_region_ids(region, region_map, region_config, annotation):
     return subregion_ids
 
 
+DEFAULT_CONFIG = {
+    "cerebellum": {
+        "region_query": {
+            "query": "Cerebellar cortex",
+            "attribute": "name",
+            "with_descendants": True,
+        },
+        "metadata": {
+            "region": {
+                "name": "Cerebellar cortex",
+                "query": "@^***|cbf$",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": ["***mo", "***pu", "***gr", "cbf"],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {
+            "*mo": 1.0,
+            "*pu": 0.0,
+            "*gr": -1.0,
+            "cbf": -5.0,
+            "outside_of_brain": 3.0,
+        },
+    },
+    "isocortex": {
+        "region_query": {"query": "Isocortex", "attribute": "name", "with_descendants": True},
+        "metadata": {
+            "region": {
+                "name": "Extended Isocortex",
+                "query": "@^***|lfbs$",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": [
+                    "@***1[ab]?$",
+                    "@***[2-3][ab]?$",
+                    "@***4[ab]?$",
+                    "@***5[ab]?$",
+                    "@***6[ab]?$",
+                    "lfbs",
+                ],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {
+            "@***1[ab]?$": 6,
+            "@***[2-3][ab]?$": 5,
+            "@***4[ab]?$": 3,
+            "@***5[ab]?$": 2,
+            "@***6[ab]?$": 1,
+            "lfbs": -2,
+            "outside_of_brain": 0,
+        },
+    },
+}
+
+
 @app.command()
 @common_atlas_options
 @click.option(
@@ -470,19 +533,22 @@ def _get_region_ids(region, region_map, region_config, annotation):
     required=True,
     help="Path of file to write the direction vectors to.",
 )
-@click.option("--config-path", type=str, required=True, help="path to config file")
+@click.option("--config-path", type=str, required=False, default=None, help="path to config file")
 @log_args(L)
 def from_config(annotation_path, hierarchy_path, output_path, config_path):
     """General function to compute direction vector from a configuration file."""
-    with open(config_path) as config_file:
-        config = json.load(config_file)
+    if config_path is None:
+        config = DEFAULT_CONFIG
+    else:
+        with open(config_path) as config_file:
+            config = json.load(config_file)
 
     annotation = voxcell.VoxelData.load_nrrd(annotation_path)
     region_map = voxcell.RegionMap.load_json(hierarchy_path)
     direction_vectors = np.full(annotation.raw.shape + (3,), np.nan, dtype=np.float32)
 
     for region, region_config in config.items():
-        if region == 'cerebellum':
+        if region == "cerebellum":
             continue
 
         region_ids = _get_region_ids(region, region_map, region_config, annotation)
