@@ -523,6 +523,40 @@ DEFAULT_CONFIG = {
             "outside_of_brain": 0,
         },
     },
+    "main olfactory bulb": {
+        "region_query": {
+            "query": "Main Olfactory bulb",
+            "attribute": "name",
+            "with_descendants": False,
+        },
+        "metadata": {
+            "region": {
+                "name": "Main olfactory bulb",
+                "query": "MOB",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": [
+                    "MOBgl",
+                    "MOBopl",
+                    "MOBmi",
+                    "MOBipl",
+                    "MOBgr",
+                ],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {
+            "MOBgl": 5,
+            "MOBopl": 4,
+            "MOBmi": 3,
+            "MOBipl": 2,
+            "MOBgr": 1,
+            "outside_of_brain": 0,
+        },
+    },
 }
 
 
