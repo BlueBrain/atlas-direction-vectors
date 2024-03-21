@@ -459,7 +459,6 @@ def _get_region_ids(region, region_map, region_config, annotation):
             and region_map.is_leaf_id(subregion_id)
             and parent_id not in subregion_ids
         ):
-            print(subregion_id, parent_id)
             subregion_ids.append(parent_id)
     return subregion_ids
 
