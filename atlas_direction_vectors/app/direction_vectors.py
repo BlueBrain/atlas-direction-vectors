@@ -441,7 +441,6 @@ def _create_subregion_direction_vectors(region_id, region_config, region_map, an
 def _get_region_ids(region, region_map, region_config, annotation):
     """Fetch all the region ids that need to be processed in parallel."""
     if not region_config["region_query"].get("with_descendants", False):
-
         return region_map.find(
             region_config["region_query"]["query"], region_config["region_query"]["attribute"]
         )
@@ -525,7 +524,7 @@ DEFAULT_CONFIG = {
     },
     "main olfactory bulb": {
         "region_query": {
-            "query": "Main Olfactory bulb",
+            "query": "Main olfactory bulb",
             "attribute": "name",
             "with_descendants": False,
         },
