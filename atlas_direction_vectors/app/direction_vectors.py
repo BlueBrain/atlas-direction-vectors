@@ -425,7 +425,7 @@ def _create_subregion_direction_vectors(region_id, region_config, region_map, an
     annot[np.isin(annotation.raw, subregion_ids)] = 1
 
     has_hemisphere = not any(annot[:, :, z_halfway - 1 : z_halfway + 1].flatten())
-    L.debug("Subregion %s has hemispheres: %s", region_map.get(region_id, "name"), has_hemisphere)
+    L.info("Subregion %s has hemispheres: %s", region_map.get(region_id, "name"), has_hemisphere)
 
     return compute_layered_region_direction_vectors(
         region_map=region_map,
@@ -555,6 +555,34 @@ DEFAULT_CONFIG = {
             "MOBipl": 2,
             "MOBgr": 1,
             "outside_of_brain": 0,
+        },
+    },
+    "thalamus": {
+        "region_query": {
+            "query": "Thalamus",
+            "attribute": "name",
+            "with_descendants": False,
+        },
+        "metadata": {
+            "region": {
+                "name": "Thalamus",
+                "query": "TH",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": [
+                    "@^AD$|^AMd$|^AMv$|^AV$|^CL$|^CM$|^Eth$|^IAD$|^IAM$|^IGL$|^IMD$|^IntG$|^LD$|^LGd-co$|^LGd-ip$|^LGd-sh$|^LGv_O$|^LP$|^MD_O$|^MGd$|^MGm$|^MGv$|^PCN$|^PF$|^PIL$|^PO$|^POL$|^PR$|^PT$|^PVT$|^PoT$|^RE$|^RH$|^SGN$|^SMT$|^SPA$|^SPFm$|^SPFp$|^SubG$|^TH_O$|^VAL$|^VM$|^VPL$|^VPLpc$|^VPM$|^VPMpc$|^Xi$",
+                    "RT",
+                ],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {
+            "@^AD$|^AMd$|^AMv$|^AV$|^CL$|^CM$|^Eth$|^IAD$|^IAM$|^IGL$|^IMD$|^IntG$|^LD$|^LGd-co$|^LGd-ip$|^LGd-sh$|^LGv_O$|^LP$|^MD_O$|^MGd$|^MGm$|^MGv$|^PCN$|^PF$|^PIL$|^PO$|^POL$|^PR$|^PT$|^PVT$|^PoT$|^RE$|^RH$|^SGN$|^SMT$|^SPA$|^SPFm$|^SPFp$|^SubG$|^TH_O$|^VAL$|^VM$|^VPL$|^VPLpc$|^VPM$|^VPMpc$|^Xi$": 1.0,
+            "RT": 0.0,
+            "outside_of_brain": 3.0,
         },
     },
 }
