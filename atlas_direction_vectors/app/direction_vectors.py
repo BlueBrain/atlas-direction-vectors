@@ -459,6 +459,7 @@ def _get_region_ids(region, region_map, region_config, annotation):
             and region_map.is_leaf_id(subregion_id)
             and parent_id not in subregion_ids
         ):
+            print(subregion_id, parent_id)
             subregion_ids.append(parent_id)
     return subregion_ids
 
@@ -584,6 +585,54 @@ DEFAULT_CONFIG = {
             "RT": 0.0,
             "outside_of_brain": 3.0,
         },
+    },
+    "CA": {
+        "region_query": {
+            "query": "Ammon's horn",
+            "attribute": "name",
+            "with_descendants": True,
+        },
+        "metadata": {
+            "region": {
+                "name": "CA",
+                "query": "CA",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": ["***slm", "***sr", "***sp", "***so"],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {
+            "***slm": 2,
+            "***sr": 1,
+            "***sp": 0,
+            "***so": -1,
+            "outside_of_brain": 3.0,
+        },
+    },
+    "DG": {
+        "region_query": {
+            "query": "Dentate gyrus",
+            "attribute": "name",
+            "with_descendants": False,
+        },
+        "metadata": {
+            "region": {
+                "name": "DG",
+                "query": "DG",
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+            "layers": {
+                "queries": ["DG-po", "DG-sg", "DG-mo"],
+                "attribute": "acronym",
+                "with_descendants": True,
+            },
+        },
+        "region_to_weight": {"DG-po": 2, "DG-sg": 1, "DG-mo": 0, "outside_of_brain": 3.0,},
     },
 }
 
