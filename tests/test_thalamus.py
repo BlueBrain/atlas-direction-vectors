@@ -66,8 +66,8 @@ def test_get_common_outer_boundary():
 
 def test_compute_direction_vectors(region_map):
     voxel_data = create_voxeldata(
-        685,  # VM, Ventral medial nucleus of the thalamus
-        709,  # VP, Ventral posterior complex of the thalamus
+        718,  # VPL, Ventral posterolateral nucleus of the thalamus
+        733,  # VPM, Ventral posteromedial nucleus of the thalamus
     )
     with warnings.catch_warnings(record=True) as warnings_:
         direction_vectors = tested.compute_direction_vectors(region_map, voxel_data)
