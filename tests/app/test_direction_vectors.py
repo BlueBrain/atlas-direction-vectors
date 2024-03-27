@@ -20,7 +20,7 @@ def test_thalamus():
     with runner.isolated_filesystem():
         voxel_data = create_voxeldata(
             718,  # VPL, Ventral posterolateral nucleus of the thalamus
-            709,  # VPM, Ventral posteromedial nucleus of the thalamus
+            733,  # VPM, Ventral posteromedial nucleus of the thalamus
         )
         voxel_data.save_nrrd("annotation.nrrd")
         result = runner.invoke(
