@@ -67,10 +67,9 @@ def compute_direction_vectors(
     # BBP Confluence page located at "Circuits > Mouse Thalamus > Atlas-based Whole-thalamus
     # subregion selection".
     thalamus_query = {
-        "query": "@^AD$|^AMd$|^AMv$|^AV$|^CL$|^CM$|^Eth$|^IAD$|^IAM$|^IGL$|^IMD$|^IntG$|^LD$|"
-        + "^LGd-co$|^LGd-ip$|^LGd-sh$|^LGv_O$|^LP$|^MD_O$|^MGd$|^MGm$|^MGv$|^PCN$|^PF$|^PIL$|"
-        + "^PO$|^POL$|^PR$|^PT$|^PVT$|^PoT$|^RE$|^RH$|^RT$|^SGN$|^SMT$|^SPA$|^SPFm$|^SPFp$|"
-        + "^SubG$|^TH_O$|^VAL$|^VM$|^VPL$|^VPLpc$|^VPM$|^VPMpc$|^Xi$",
+        "query": "@^(?:AD|AMd|AMv|AV|CL|CM|Eth|IAD|IAM|IGL|IMD|IntG|LD|LGd-co|LGd-ip|LGd-sh|LGv_O|"
+        + "LP|MD_O|MGd|MGm|MGv|PCN|PF|PIL|PO|POL|PR|PT|PVT|PoT|RE|RH|SGN|SMT|SPA|SPFm|SPFp|SubG|"
+        + "TH_O|VAL|VM|VPL|VPLpc|VPM|VPMpc|Xi)$",
         "attribute": "acronym",
         "with_descendants": False,
     }
