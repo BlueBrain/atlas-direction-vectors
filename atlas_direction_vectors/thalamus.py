@@ -8,7 +8,7 @@ from typing import Union
 
 import numpy as np
 from atlas_commons.typing import BoolArray, NDArray
-from atlas_commons.utils import get_region_mask
+from atlas_commons.utils import get_region_mask, query_region_mask
 from scipy.ndimage import correlate  # type: ignore
 from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
 from voxcell import RegionMap, VoxelData
@@ -63,7 +63,19 @@ def compute_direction_vectors(
         as the input one. Voxels outside the thalamus have np.nan coordinates.
     """
 
-    thalamus_mask = get_region_mask("TH", brain_regions.raw, region_map)
+    # For information on which regions were chosen and how this list was created, see the internal
+    # BBP Confluence page located at "Circuits > Mouse Thalamus > Atlas-based Whole-thalamus
+    # subregion selection".
+    thalamus_query = {
+        "query": "@^(?:AD|AMd|AMv|AV|CL|CM|Eth|IAD|IAM|IGL|IMD|IntG|LD|LGd-co|LGd-ip|LGd-sh|LGv_O|"
+        + "LP|MD_O|MGd|MGm|MGv|PCN|PF|PIL|PO|POL|PR|PT|PVT|PoT|RE|RH|SGN|SMT|SPA|SPFm|SPFp|SubG|"
+        + "TH_O|VAL|VM|VPL|VPLpc|VPM|VPMpc|Xi)$",
+        "attribute": "acronym",
+        "with_descendants": False,
+    }
+
+    thalamus_mask = query_region_mask(thalamus_query, brain_regions.raw, region_map)
+
     reticular_nucleus_mask = get_region_mask("RT", brain_regions.raw, region_map)
     reticular_nucleus_complement_mask = np.logical_and(thalamus_mask, ~reticular_nucleus_mask)
     common_outer_boundary_mask = _get_common_outer_boundary(thalamus_mask, reticular_nucleus_mask)
