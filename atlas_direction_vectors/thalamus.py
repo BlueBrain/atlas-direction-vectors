@@ -10,7 +10,7 @@ import numpy as np
 from atlas_commons.typing import BoolArray, NDArray
 from atlas_commons.utils import get_region_mask, query_region_mask
 from scipy.ndimage import correlate  # type: ignore
-from scipy.ndimage.morphology import generate_binary_structure  # type: ignore
+from scipy.ndimage import generate_binary_structure  # type: ignore
 from voxcell import RegionMap, VoxelData
 
 from atlas_direction_vectors.algorithms.layer_based_direction_vectors import (
