@@ -1,10 +1,18 @@
 """Low-level tools for the computation of direction vectors"""
 
+import logging
+from typing import Union
+
 import numpy as np  # type: ignore
+import pyquaternion as pyq
 from atlas_commons.utils import FloatArray, NumericArray, normalize
+from joblib import Parallel, delayed
 from scipy.ndimage import gaussian_filter  # type: ignore
 from scipy.ndimage import generate_binary_structure  # type: ignore
+from scipy.optimize import minimize
 from scipy.signal import correlate  # type: ignore
+
+L = logging.getLogger(__name__)
 
 
 def compute_blur_gradient(
@@ -45,26 +53,49 @@ def compute_blur_gradient(
 
 
 def _quaternion_from_vectors(  # pylint: disable=invalid-name
-    s: NumericArray, t: NumericArray
+    s: NumericArray, t: NumericArray, align_to: Union[NumericArray, None] = None
 ) -> NumericArray:
     """
     Returns the quaternion (s cross t) + (s dot t + |s||t|).
 
     This quaternion q maps s to t, i.e., qsq^{-1} = t.
 
+    If align_to is specified (either `x`, or `z`), we will rotate it around its axis ([0, 1, 0])
+    so that it is maximally aligned with `align_to`.
+
     Args:
         s: numeric array of shape (3,) or (N, 3).
         t: numeric array of shape (N, 3) if s has two dimensions and its first dimension is N.
+        align_to: if not None, the returned quaternion is aligned with the given axis.
     Returns:
         Numeric array of shape (N, 4) where N is the first dimension of t.
         This data is interpreted as a 1D array of quaternions with size N. A quaternion is a 4D
         vector [w, x, y, z] where [x, y, z] is the imaginary part.
     """
     w = np.matmul(s, np.array(t).T) + np.linalg.norm(s, axis=-1) * np.linalg.norm(t, axis=-1)
-    return np.hstack([w[:, np.newaxis], np.cross(s, t)])
+    quaternions = np.hstack([w[:, np.newaxis], np.cross(s, t)])
+
+    if align_to is not None:
+        target_dir = {"x": np.array([1.0, 0.0, 0.0]), "z": np.array([0.0, 0.0, 1.0])}[align_to]
+
+        def rotate_q(_q):
+            q = pyq.Quaternion(_q)
+
+            def cost(a):
+                q_rot = pyq.Quaternion(axis=[0, 1, 0], angle=a)
+                return -(q * q_rot).rotate(target_dir).dot(target_dir)
+
+            angle = minimize(cost, 0.0).x
+            return (q * pyq.Quaternion(axis=[0, 1, 0], angle=angle)).q.tolist()
+
+        L.info("We are aligning %s quaternions to %s", len(quaternions), align_to)
+        with Parallel(n_jobs=-1, batch_size=10000, verbose=10) as parallel:
+            quaternions = np.array(parallel(delayed(rotate_q)(q) for q in quaternions))
+
+    return quaternions
 
 
-def vector_to_quaternion(vector_field: FloatArray) -> FloatArray:
+def vector_to_quaternion(vector_field: FloatArray, align_to: Union[str, None] = None) -> FloatArray:
     """
     Find quaternions which rotate [0.0, 1.0, 0.0] to each vector in `vector_field`.
 
@@ -75,6 +106,7 @@ def vector_to_quaternion(vector_field: FloatArray) -> FloatArray:
     Arguments:
         vector_field: field of floating point 3D unit vectors, i.e., a float array of shape
             (..., 3).
+        align_to: if not None, the returned quaternion is aligned with the given axis.
 
     Returns:
         numpy.ndarray of shape (..., 4) and of the same type as the input
@@ -88,7 +120,7 @@ def vector_to_quaternion(vector_field: FloatArray) -> FloatArray:
     quaternions = np.full(vector_field.shape[:-1] + (4,), np.nan, dtype=vector_field.dtype)
     non_nan_mask = ~np.isnan(np.linalg.norm(vector_field, axis=-1))
     quaternions[non_nan_mask] = _quaternion_from_vectors(
-        [0.0, 1.0, 0.0], vector_field[non_nan_mask]
+        [0.0, 1.0, 0.0], vector_field[non_nan_mask], align_to=align_to
     )
     return quaternions
 

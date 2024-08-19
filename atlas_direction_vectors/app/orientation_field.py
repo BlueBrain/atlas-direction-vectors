@@ -17,7 +17,9 @@ the y-axis of q is directed along e. The latter is a requirement of the morpholo
 convention used by the placement algorithm, see
 https://bbpteam.epfl.ch/documentation/projects/placement-algorithm/latest/index.html.
 """
+
 import logging
+from typing import Union
 
 import click
 import voxcell  # type: ignore
@@ -45,15 +47,22 @@ L = logging.getLogger(__name__)
     "NaN vectors indicate out-of-domain voxels but also voxels for which an orientation could"
     " not be derived.",
 )
+@click.option(
+    "--align-to",
+    type=str,
+    required=False,
+    help=("Direction to align the direction vectors to."),
+)
 @log_args(L)
 def cmd(
     direction_vectors_path: str,
     output_path: str,
+    align_to: Union[str, None] = None,
 ) -> None:
     """Turn direction vectors into quaternions interpreted as 3D orientations."""
 
     direction_vectors = voxcell.VoxelData.load_nrrd(direction_vectors_path)
-    quaternions = vector_to_quaternion(direction_vectors.raw)
+    quaternions = vector_to_quaternion(direction_vectors.raw, align_to=align_to)
     voxcell.OrientationField(
         quaternions, direction_vectors.voxel_dimensions, direction_vectors.offset
     ).save_nrrd(output_path)

@@ -15,6 +15,7 @@ shells, a.k.a lower and upper shells.
 
 This script is used to compute the mouse isocortex and the mouse thalamus directions vectors.
 """
+
 from __future__ import annotations
 
 import enum
